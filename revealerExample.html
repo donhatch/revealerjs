@@ -6,19 +6,38 @@
         color: purple;
         background-color: #ffeedd;
       }
+
+      .clip-inset-dragger-container {
+        width:100%;
+        height:100%;
+        position:relative; /* needed to make children position:absolute work properly */
+        user-select:none; /* seems to be adequate to prevent select on all descendents. without this, the two images get haphazardly selected during dragging. :-( not sure whether it will be appropriate for maps though */
+      }
+      .clip-inset-dragger-container > * {
+        width:100%;
+        height:100%;
+        position:absolute;
+      }
+
+
+
+
+
+
       .revealer-container {
         width:100%;
         height:100%;
         position:relative; /* needed to make children position:absolute work properly */
-
         user-select:none; /* seems to be adequate to prevent select on all descendents. without this, the two images get haphazardly selected during dragging. :-( not sure whether it will be appropriate for maps though */
       }
-      .revealer-container img {
-        /* this should maybe actually be policy, for the revealed children? */
+
+      .revealer-container > * {
         width:100%;
         height:100%;
         position:absolute;
+      }
 
+        .revealer-container img {
         /* without the following, once in a while attempts to move the handle are half-interpreted as img ghost drags in which the handle gets the mousedown but there's no mouseup-- frustrating */
         user-drag:none;
         -webkit-user-drag: none; /* this is the one that's honored, in chrome 55.0.2883.44 beta anyway */
@@ -62,7 +81,26 @@
     </style>
   </head>
   <body>
-    <br>
+   <div class="clip-inset-dragger-container" style="display:inline-block; width:58px; height:140; font-size:40px;">
+     <div style="clip-path:inset(0   50% 50% 0); color:red;">111<br>111<br>111</div>
+     <div style="clip-path:inset(0   0   50% 50%); color:green;">222<br>222<br>222</div>
+     <div style="clip-path:inset(50% 50% 0   0); color:green;">333<br>333<br>333</div>
+     <div style="clip-path:inset(50% 0   0   50%); color:blue;">444<br>444<br>444</div>
+   </div>
+   &nbsp; &nbsp; &nbsp; &nbsp;
+   <div class="clip-inset-dragger-container" style="display:inline-block; width:80px; height:180; font-size:40px;">
+     <div data-draggable="ES"   style="clip-path:inset(0   67% 67% 0); color:red;">1111<br>1111<br>1111<br>1111</div>
+     <div data-draggable="ESW"  style="clip-path:inset(0   33% 67% 33%); color:green;">2222<br>2222<br>2222<br>2222</div>
+     <div data-draggable="SW"   style="clip-path:inset(0   0   67% 67%); color:blue;">3333<br>3333<br>3333<br>3333</div>
+     <div data-draggable="NES"  style="clip-path:inset(33% 67% 33% 0); color:green;">4444<br>4444<br>4444<br>4444</div>
+     <div data-draggable="NESW" style="clip-path:inset(33% 33% 33% 33%); color:blue;">5555<br>5555<br>5555<br>5555</div>
+     <div data-draggable="SWN"  style="clip-path:inset(33% 0   33% 67%); color:red;">6666<br>6666<br>6666<br>6666</div>
+     <div data-draggable="NE"   style="clip-path:inset(67% 67% 0   0); color:blue;">7777<br>7777<br>7777<br>7777</div>
+     <div data-draggable="WNE"  style="clip-path:inset(67% 33% 0   33%); color:red;">8888<br>8888<br>8888<br>8888</div>
+     <div data-draggable="WN"   style="clip-path:inset(67% 0   0   67%); color:green;">9999<br>9999<br>9999<br>9999</div>
+     <div></div>
+   </div>
+   <hr>
     Original before and after images:
     <img src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" width="200" height="100">
     <img src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" width="200" height="100">       
@@ -115,143 +153,21 @@
       </tr>
     </table>
   </body>
+  <script src="revealer.js"></script>
   <script>
-    "use strict";
-    let setUpRevealer = function(container) {
-      let verboseLevel = 1;
-      if (verboseLevel >= 1) console.log("    in setupRevealer(container=",container,")");
-      let handles = container.getElementsByClassName("revealer-handle");
-      if (handles.length != 1) {
-        throw new Error("setUpRevealer: number of elements of class \"revealer-handle\" under container is "+handles.length+", expected 1");
+    {
+      var containers = document.getElementsByClassName("revealer-container");
+      console.log("  revealer-containers=",containers);
+      for (let container of containers) {
+        setUpRevealer(container);
       }
-      if (verboseLevel >= 1) console.log("      handles=",handles);
-      let handle = handles[0];
-
-      // XXX TODO: handle and sanity check all cases:
-      //        W E
-      //        N S
-      //        NW NE S
-      //        SE SW N
-      //        NW SW E
-      //        NE SE W
-      //        NW NE SW SE
-      let childN = container.getElementsByClassName("revealer-child-N")[0];
-      let childS = container.getElementsByClassName("revealer-child-S")[0];
-      let childW = container.getElementsByClassName("revealer-child-W")[0];
-      let childE = container.getElementsByClassName("revealer-child-E")[0];
-      let childNW = container.getElementsByClassName("revealer-child-NW")[0];
-      let childSW = container.getElementsByClassName("revealer-child-SW")[0];
-      let childNE = container.getElementsByClassName("revealer-child-NE")[0];
-      let childSE = container.getElementsByClassName("revealer-child-SE")[0];
-
-      handle.addEventListener("mousedown", event => {
-        let verboseLevel = 0;
-        if (verboseLevel >= 1) console.log("        in mousedown(event=",event,")");
-        if (verboseLevel >= 1) console.log("          event=",event);
-        // there are a bunch of X,Y's, apparently clientX,clientY are the only portable reliable ones.
-        let x_on_mousedown = event.clientX;
-        let y_on_mousedown = event.clientY;
-        let x = x_on_mousedown;
-        let y = y_on_mousedown;
-        let handle_left_on_mousedown = getComputedStyle(handle, null).left; // in pixels unfortunately
-        if (verboseLevel >= 1) console.log("          handle_left_on_mousedown = ",handle_left_on_mousedown);
-        if (!handle_left_on_mousedown.endsWith('px')) {
-          throw new Error("Expected style to end in 'px', got "+JSON.stringify(handle_left_on_mousedown));
-        }
-        let handle_left_pixels_on_mousedown = parseFloat(handle_left_on_mousedown); /* trailing 'px' ignored per doc */
-        if (verboseLevel >= 1) console.log("          handle_left_pixels_on_mousedown = ",handle_left_pixels_on_mousedown);
-        // TODO: look into possibly using getBoundingClientRect() or getClientRects()
-        let container_width_on_mousedown = container.offsetWidth;
-        if (verboseLevel >= 1) console.log("          container_width_on_mousedown = ",container_width_on_mousedown);
-        let handle_left_percentage_on_mousedown = handle_left_pixels_on_mousedown / container_width_on_mousedown * 100;
-        if (verboseLevel >= 1) console.log("          handle_left_percentage_on_mousedown = ",handle_left_percentage_on_mousedown);
-        // Add mousemove and mouseup handlers to document,
-        // not to handle element
-        // (or even to to handle's ancestors, which is what jotform's does).
-        // That makes sure we see the events even if outside the element
-        // (even if outside the window).
-        // In particular, we'll see the mouseup even if it's outside the element
-        // (even outside the window), thereboy avoiding a common type of bug
-        // in which we get into a state where we think the mouse is down when it isn't.
-        // removeEventListener requires named functions, not anonymous...
-        let mousemove = function(event) {
-          let verboseLevel = 0;
-          if (verboseLevel >= 2) console.log("            in mousemove");
-
-          //console.log("              event=",event);
-          let Dx = event.clientX - x_on_mousedown;
-          let Dy = event.clientY - y_on_mousedown;
-          let dx = event.clientX - x;
-          let dy = event.clientY - y;
-          x = event.clientX;
-          y = event.clientY;
-          if (verboseLevel >= 1) console.log("              button = ",event.button);
-          if (verboseLevel >= 1) console.log("              buttons = ",event.buttons);
-          if (verboseLevel >= 1) console.log("              dx,y = "+dx+","+dy+"  Dx,y = "+Dx+","+Dy+"  x,y="+x+","+y);
-
-          // Make sure a button is still down.
-          // If not, abort the manipulation.
-          // This prevents various screwups in which the mouseup gets lost
-          // (e.g. bringing up menu, initiating drag on images, ...)
-          if (event.buttons === 0) {
-            console.log("              HEY! mouse button not down any more!  aborting manipulation");
-            document.removeEventListener("mousemove", mousemove);
-            document.removeEventListener("mouseup", mouseup);
-            return;
-          }
-
-
-          if (dx != 0) {
-            // Compute new percentage.
-            let new_left_pixels = handle_left_pixels_on_mousedown + Dx;
-            if (verboseLevel >= 1) console.log("                  new_left_pixels = "+new_left_pixels);
-            let new_left_percentage = new_left_pixels / container_width_on_mousedown * 100;
-            if (verboseLevel >= 1) console.log("                  new_left_percentage = "+new_left_percentage);
-            // Clamp new percentage to [0,100].
-            let clamp = (x,a,b) => x<=a?a:x>=b?b:x;
-            new_left_percentage = clamp(new_left_percentage, 0, 100);
-            if (verboseLevel >= 1) console.log("                  new_left_percentage = "+new_left_percentage+" (clamped)");
-
-
-            // Set the following to it, in percentage rather than pixels
-            // (for graceful behavior on resize):
-            //   - handle's left
-            //   - child-W's clip inset right
-            //   - child-E's clip inset left
-            // etc.
-            let freeNS = !(childE !== undefined && childW !== undefined); // it's only non-free in that one configuration
-            let freeEW = !(childN !== undefined && childN !== undefined); // it's only non-free in that one configuration
-            if (freeEW) handle.style.left = new_left_percentage+'%';
-            if (freeNS) handle.style.top = new_top_percentage+'%';
-
-            if (childN !== undefined) childN.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% 0)";
-            if (childE !== undefined) childE.style.clipPath = "inset(0 0 0 "+new_left_percentage+"%)";
-            if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"%) 0 0 0)";
-            if (childW !== undefined) childW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% 0 0)";
-            if (childNW !== undefined) childNW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% "+(100-new_top_percentage)+"% 0)";
-            if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"%) 0 0 "+new_left_percentage+"%)";
-            if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"%) "+(100-new_left_percentage)+"% 0 0)";
-            if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
-          }
-
-          if (verboseLevel >= 2) console.log("            out mousemove");
-        };
-        let mouseup = function(event) {
-          if (verboseLevel >= 1) console.log("        in mouseup(event=",event,")");
-          document.removeEventListener("mousemove", mousemove);
-          document.removeEventListener("mouseup", mouseup);
-          if (verboseLevel >= 1) console.log("        out mouseup(event=",event,")");
-        };
-        document.addEventListener("mousemove", mousemove);
-        document.addEventListener("mouseup", mouseup);
-        if (verboseLevel >= 1) console.log("        out mousedown(event=",event,")");
-      });
-      if (verboseLevel >= 1) console.log("    out setupRevealer(container=",container,")");
-    };
-    var containers = document.getElementsByClassName("revealer-container");
-    console.log("  containers=",containers);
-    for (let container of containers) {
-      setUpRevealer(container);
+    }
+    {
+      var containers = document.getElementsByClassName("clip-inset-dragger-container");
+      console.log("  clip-inset-dragger-containers=",containers);
+      for (let container of containers) {
+        setUpClipInsetDragger(container);
+      }
     }
   </script>
 </html>
