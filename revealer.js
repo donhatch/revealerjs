@@ -32,15 +32,18 @@ let setUpRevealer = function(container) {
 
   let toArray = htmlCollection => [].slice.call(htmlCollection);
 
-  let handlesEW = toArray(container.getElementsByClassName("revealer-handle-EW"));
-  let handlesNS = toArray(container.getElementsByClassName("revealer-handle-NS"));
-  let handlesEWhair = toArray(container.getElementsByClassName("revealer-handle-EWhair"));
-  let handlesNShair = toArray(container.getElementsByClassName("revealer-handle-NShair"));
+  let handlesEW = toArray(container.getElementsByClassName("revealer-handle-EW"))
+          .concat(toArray(container.getElementsByClassName("revealer-handle-EWhair")))
+          .concat(toArray(container.getElementsByClassName("revealer-handle-EWhair-N-part-only")))
+          .concat(toArray(container.getElementsByClassName("revealer-handle-EWhair-S-part-only")));
+  let handlesNS = toArray(container.getElementsByClassName("revealer-handle-NS"))
+          .concat(toArray(container.getElementsByClassName("revealer-handle-NShair")))
+          .concat(toArray(container.getElementsByClassName("revealer-handle-NShair-E-part-only")))
+          .concat(toArray(container.getElementsByClassName("revealer-handle-NShair-W-part-only")));
   let handlesBidirectional = toArray(container.getElementsByClassName("revealer-handle-bidirectional"));
-  let handles = handlesEW.concat(handlesNS).concat(handlesEWhair).concat(handlesNShair).concat(handlesBidirectional);
-
-  let handlesThatMoveEW = handlesEW.concat(handlesEWhair).concat(handlesBidirectional);
-  let handlesThatMoveNS = handlesNS.concat(handlesNShair).concat(handlesBidirectional);
+  let handles = handlesEW.concat(handlesNS).concat(handlesBidirectional);
+  let handlesThatMoveEW = handlesEW.concat(handlesBidirectional);
+  let handlesThatMoveNS = handlesNS.concat(handlesBidirectional);
 
   if (verboseLevel >= 1) console.log("      handles=",handles);
   for (let handle of handles) {

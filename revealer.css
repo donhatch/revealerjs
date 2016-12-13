@@ -12,6 +12,7 @@
  * Implementation notes:
  *  - This stuff should maybe be added by the js?  Not sure.
  *  - for some reason the "before" pseudo-element (or pseudo-class) comes out stacked on top of the primary thing (but under the "after" pseudo-element if any). is this a bug? (for current implementation, before or after doesn't matter since the pseudo-element is fully transparent)
+ *  - to debug the thick invisible lines, change all the "transparent"s to "darkblue" or something
  */
 
 .revealer-child-W  { clip-path: inset(0 50% 0 0); }
@@ -50,9 +51,9 @@
 }
 .revealer-handle-EWhair-S-part-only:before { /* thick invisible line for easier selection */
   width:10px;
-  height:50%;
+  height:100%; /* of the thing it's following! not of the parent */
   position:absolute;
-  left:50%; top:75%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%);
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
@@ -66,9 +67,9 @@
 }
 .revealer-handle-EWhair-N-part-only:before { /* thick invisible line for easier selection */
   width:10px;
-  height:50%;
+  height:100%; /* of the thing it's following, not of the parent */
   position:absolute;
-  left:50%; top:25%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%);
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
@@ -109,9 +110,9 @@
 }
 .revealer-handle-NShair-E-part-only:before { /* thick invisible line for easier selection */
   height:10px;
-  width:50%;
+  width:100%; /* of the thing it's following, not the parent */
   position:absolute;
-  left:75%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%);
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
@@ -125,9 +126,9 @@
 }
 .revealer-handle-NShair-W-part-only:before { /* thick invisible line for easier selection */
   height:10px;
-  width:50%;
+  width:100%; /* of the thing it's following, not the parent */
   position:absolute;
-  left:25%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%);
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
