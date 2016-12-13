@@ -20,10 +20,6 @@
       }
 
 
-
-
-
-
       .revealer-container {
         width:100%;
         height:100%;
@@ -37,7 +33,7 @@
         position:absolute;
       }
 
-        .revealer-container img {
+      .revealer-container img {
         /* without the following, once in a while attempts to move the handle are half-interpreted as img ghost drags in which the handle gets the mousedown but there's no mouseup-- frustrating */
         user-drag:none;
         -webkit-user-drag: none; /* this is the one that's honored, in chrome 55.0.2883.44 beta anyway */
@@ -45,40 +41,8 @@
         -moz-user-drag: none;
         -o-user-drag: none;
       }
-
-      /* actually should try to do this solely with pseudo-elements? and/or the enable function could add the element if not already there.  hmm I think the latter; pseudo-elements are not that configurable (can only be a before and an after) */
-      .revealer-handle {
-
-        /* the primary one is the full-height one, so we can use a percantage of the parent */
-        width:1px;
-        height:100%;
-
-        /* background-color:rgba(127,127,127, .5); */
-        background-color:black;
-        position:absolute;
-        left:50%; top:50%; transform:translate(-50%,-50%); /* thanks https://css-tricks.com/centering-css-complete-guide/#vertical-block  http://zerosixthree.se/vertical-align-anything-with-just-3-lines-of-css/ */
-        cursor: ew-resize;
-      }
-      /* note, for some reason the "before" pseudo-element (or pseudo-class) comes out stacked on top of the primary thing (but under the "after" pseudo-element if any). is this a bug? */
-      .revealer-handle:before { /* thick invisible line for easier selection */
-        width:16px;
-        height:100%;
-        position:absolute;
-        left:50%; top:50%; transform:translate(-50%,-50%); /* thanks https://css-tricks.com/centering-css-complete-guide/#vertical-block  http://zerosixthree.se/vertical-align-anything-with-just-3-lines-of-css/ */
-        background-color:transparent;
-        content:''; /* pseudo-elements require content to function  */
-      }
-      .revealer-handle:after {
-        width:8px;
-        height:20px;
-
-        position:absolute;
-        left:50%; top:50%; transform:translate(-50%,-50%); /* thanks https://css-tricks.com/centering-css-complete-guide/#vertical-block  http://zerosixthree.se/vertical-align-anything-with-just-3-lines-of-css/ */
-        background-color: #00c000; /* slightly darkened green */
-        background-color: #a080ff;
-        content:''; /* pseudo-elements require content to function  */
-      }
     </style>
+    <link rel="stylesheet" href="revealer.css"></link>
   </head>
   <body>
    <div class="clip-inset-dragger-container" style="cursor:crosshair; display:inline-block; width:80px; height:180; font-size:40px; border-style:solid; border-width:5px; border-color:black;">
@@ -91,6 +55,7 @@
      <div data-draggable="TR"   style="clip-path:inset(67% 67% 0   0); color:blue; background-color:lightblue;">7777<br>7777<br>7777<br>7777</div>
      <div data-draggable="LTR"  style="clip-path:inset(67% 33% 0   33%); color:red; background-color:pink;">8888<br>8888<br>8888<br>8888</div>
      <div data-draggable="LT"   style="clip-path:inset(67% 0   0   67%); color:green; background-color:lightgreen;">9999<br>9999<br>9999<br>9999</div>
+     <div></div>
    </div>
    &nbsp; &nbsp; &nbsp; &nbsp;
    <div class="clip-inset-dragger-container" style="cursor:crosshair; display:inline-block; width:58px; height:140; font-size:40px; border-style:solid; border-width:5px; border-color:black;">
@@ -120,33 +85,39 @@
     <table style="width:100%; height:50%;">
       <tr>
         <td>
-          <div id="container1" class="revealer-container"> <!-- position is needed to make children position:absolute work properly -->
+          <div id="container1" class="revealer-container">
             <img class="revealer-child-W" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" style="clip-path: inset(0 50% 0 0)">
             <img class="revealer-child-E" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" style="clip-path: inset(0 0 0 50%);">
-            <div class="revealer-handle"></div>
+            <div class="revealer-handle-EWhair"></div>
+            <div class="revealer-handle-EW"></div>
           </div>
         </td>
         <td>
-          <div id="container1" class="revealer-container"> <!-- position is needed to make children position:absolute work properly -->
-            <img class="revealer-child-W" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" style="clip-path: inset(0 50% 0 0)">
-            <img class="revealer-child-E" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" style="clip-path: inset(0 0 0 50%);">
-            <div class="revealer-handle"></div>
+          <div id="container2" class="revealer-container">
+            <img class="revealer-child-N" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" style="clip-path: inset(0 0 50% 0)">
+            <img class="revealer-child-S" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" style="clip-path: inset(50% 0 0 0);">
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-NS"></div>
           </div>
         </td>
       </tr>
       <tr>
         <td>
-          <div id="container1" class="revealer-container"> <!-- position is needed to make children position:absolute work properly -->
+          <div id="container1" class="revealer-container">
             <img class="revealer-child-W" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" style="clip-path: inset(0 50% 0 0)">
             <img class="revealer-child-E" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" style="clip-path: inset(0 0 0 50%);">
-            <div class="revealer-handle"></div>
+            <div class="revealer-handle-EWhair"></div>
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-bidirectional"></div>
           </div>
         </td>
         <td>
-          <div id="container1" class="revealer-container"> <!-- position is needed to make children position:absolute work properly -->
-            <img class="revealer-child-W" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" style="clip-path: inset(0 50% 0 0)">
-            <img class="revealer-child-E" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" style="clip-path: inset(0 0 0 50%);">
-            <div class="revealer-handle"></div>
+          <div id="container2" class="revealer-container">
+            <img class="revealer-child-N" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" style="clip-path: inset(0 0 50% 0)">
+            <img class="revealer-child-S" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" style="clip-path: inset(50% 0 0 0);">
+            <div class="revealer-handle-EWhair"></div>
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-bidirectional"></div>
           </div>
         </td>
       </tr>

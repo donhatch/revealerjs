@@ -1,0 +1,84 @@
+/*
+ * Styling for the following element classes
+ *    revealer-handle-EW - handle to be placed between revealer-child-W and revealer-child-E
+ *    revealer-handle-NS - handle to be placed between revealer-child-N and revealer-child-S
+ *    revealer-handle-bidirectional - handle to be placed in the middle of a 4-way revealer
+ *
+ *    revealer-handle-EWhair - optional, put one of these before the revealer-handle-EW or revealer-handle-bidirectional
+ *    revealer-handle-NShair - optional, put one of these before the revealer-handle-NS or revealer-handle-bidirectional
+ */
+
+/*
+ * Implementation notes:
+ *   - This stuff should maybe be added by the js?  Not sure.
+ *  - for some reason the "before" pseudo-element (or pseudo-class) comes out stacked on top of the primary thing (but under the "after" pseudo-element if any). is this a bug?
+ */
+
+.revealer-handle-EWhair {
+  /* the primary one is the full-height one, so we can use a percantage of the parent */
+  width:1px;
+  height:100%;
+  background-color:black;
+  position:absolute;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  cursor: col-resize;
+}
+.revealer-handle-EWhair:before { /* thick invisible line for easier selection */
+  width:16px;
+  height:100%;
+  position:absolute;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  background-color:transparent;
+  content:''; /* pseudo-elements require content to function  */
+}
+.revealer-handle-EW {
+  width:8px;
+  height:20px;
+
+  position:absolute;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  background-color: #a080ff; /* violetish light blue */
+  cursor: col-resize;
+}
+
+
+
+.revealer-handle-NShair {
+  /* the primary one is the full-width one, so we can use a percantage of the parent */
+  height:1px;
+  width:100%;
+  background-color:black;
+  position:absolute;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  cursor: row-resize;
+}
+
+.revealer-handle-NShair:before { /* thick invisible line for easier selection */
+  height:16px;
+  width:100%;
+  position:absolute;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  background-color:transparent;
+  content:''; /* pseudo-elements require content to function  */
+}
+
+.revealer-handle-NS {
+  height:8px;
+  width:20px;
+
+  position:absolute;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  background-color: #a080ff; /* violetish light blue */
+  cursor: row-resize;
+}
+
+
+.revealer-handle-bidirectional {
+  height:12px;
+  width:12px;
+  background-color:transparent;
+  position:absolute;
+  left:50%; top:50%; transform:translate(-50%,-50%);
+  background-color: #a080ff; /* violetish light blue */
+  cursor: move;
+}
