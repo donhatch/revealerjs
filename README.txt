@@ -24,7 +24,6 @@ Bugs:
 Usage:
   - see revealerExample.html
 
-
 Prior art:
 
    This is the first one I found, it looks slick but a bit old
