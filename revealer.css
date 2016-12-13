@@ -6,6 +6,10 @@
  *
  *    revealer-handle-EWhair - optional, put one of these before the revealer-handle-EW or revealer-handle-bidirectional
  *    revealer-handle-NShair - optional, put one of these before the revealer-handle-NS or revealer-handle-bidirectional
+ *    revealer-handle-EWhair-N-part-only - optional, put one of these on the appropriate 3-way comparison
+ *    revealer-handle-EWhair-S-part-only - optional, put one of these on the appropriate 3-way comparison
+ *    revealer-handle-NShair-W-part-only - optional, put one of these on the appropriate 3-way comparison
+ *    revealer-handle-NShair-E-part-only - optional, put one of these on the appropriate 3-way comparison
  */
 
 /*
