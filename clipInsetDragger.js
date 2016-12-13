@@ -1,5 +1,3 @@
-// BUG: in example html, the 1234 example has text cursor but the 123456789 example has pointer cursor! why?
-
 // Attempt at easer-to-use less-buggy more versatile
 // image revealer.
 //
