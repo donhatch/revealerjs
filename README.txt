@@ -20,6 +20,15 @@ Limitations:
 
 Bugs:
   - in the 3-pane views, the half-hairs don't shrink and expand properly
+  - cursors aren't ideal on ubuntu..
+     I like the way move, col-resize, row-resize look on macbook pro with chrome 55.0.2883.44,
+     but they are crappy on ubuntu with chrome 56.0.2924.21.
+     see:
+       https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
+       https://css-tricks.com/almanac/properties/c/cursor/
+       http://www.evotech.net/blog/2007/04/controlling-cursors-with-css-and-creating-cur-files/
+    if I care enough, I could compose one by hand using something like:
+      cursor: url(data:image/png;base64,iVBORw0KGgoAASUhEUgAAACAAAAAgCAYAAABzenr0AAAJFklEQVR42rWXCXBU9R3Hv+/V...), move;
 
 Usage:
   - see revealerExample.html
