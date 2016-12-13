@@ -187,8 +187,16 @@ let setUpRevealer = function(container) {
           if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
         }
 
+        // I don't really understand preventDefault() and stopPropagation(),
+        // but, empirically, preventDefault is good because it prevents
+        // crazy selecting-random-things behavior when dragging outside the container.
+        // It also makes it so I don't have to say user-select:none for descendents of the container!  Hooray!
+        // Also don't need user-drag:none, nor draggable="false" on images
+        // (unless I want that for other reasons).
+        event.preventDefault();
+
         if (verboseLevel >= 2) console.log("            out mousemove");
-      };
+      }; // mousemove
       let mouseup = function(event) {
         if (verboseLevel >= 1) console.log("        in mouseup(event=",event,")");
         document.removeEventListener("mousemove", mousemove);

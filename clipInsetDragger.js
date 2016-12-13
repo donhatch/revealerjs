@@ -374,6 +374,15 @@ let setUpClipInsetDragger = function(container) {
           if (verboseLevel >= 1) console.log("                      desired_percent="+desired_percent);
           child.style.clipPath = 'inset(' + tokens.join(' ') + ')';
         }
+
+        // I don't really understand preventDefault() and stopPropagation(),
+        // but, empirically, preventDefault is good because it prevents
+        // crazy selecting-random-things behavior when dragging outside the container.
+        // It also makes it so I don't have to say user-select:none for descendents of the container!  Hooray!
+        // Also don't need user-drag:none, nor draggable="false" on images
+        // (unless I want that for other reasons).
+        event.preventDefault();
+
         if (verboseLevel >= 1) console.log("            out mousemove");
       };
       let mouseup = function(event) {
@@ -390,11 +399,7 @@ let setUpClipInsetDragger = function(container) {
       document.addEventListener("mouseup", mouseup);
     } // if draggingSpecs.length > 0
 
-      // TODO: very confused about the ghost-drag behavior at the moment.
-      //event.preventDefault(); // prevents the default ghost-drag behavior (whether or not we initiated a drag above). XXX not sure we want this.  if there's a map underneath, don't we want to
-      // TODO: what about stopPropagation?
-
-      if (verboseLevel >= 1) console.log("        out mousedown");
+    if (verboseLevel >= 1) console.log("        out mousedown");
   }; // mousedown
   container.addEventListener("mousedown", mousedown);
 
