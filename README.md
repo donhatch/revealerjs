@@ -1,4 +1,4 @@
-This is an attempt at easer-to-use less-buggy more versatile image revealer aka before/after slider.
+This is an attempt at easer-to-use less-buggy more versatile image revealer, aka before/after slider.
 The styling is currently not very versatile though, and everything starts at 50%.
 
 Requirements:

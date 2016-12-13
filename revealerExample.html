@@ -20,6 +20,11 @@
         position:absolute;
       }
 
+      /* making all children partially transparent helps make sure the clip regions partition the container as intended */
+      .partially-transparent {
+        opacity: .75;
+      }
+
       .revealer-container img {
         /* without the following, once in a while attempts to move the handle are half-interpreted as img ghost drags in which the handle gets the mousedown but there's no mouseup-- frustrating */
         user-drag:none;
@@ -50,41 +55,80 @@
               (if I don't set draggable="false" on the image)
 
     -->
-    <table style="width:100%; height:50%;">
+    <table style="width:100%; height:100%;">
       <tr>
-        <td>
+        <td colspan="2">
           <div id="container1" class="revealer-container">
-            <img class="revealer-child-W" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
-            <img class="revealer-child-E" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <img class="revealer-child-W partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-E partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
             <div class="revealer-handle-EWhair"></div>
             <div class="revealer-handle-EW"></div>
           </div>
         </td>
-        <td>
+        <td colspan="2">
           <div id="container2" class="revealer-container">
-            <img class="revealer-child-N" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
-            <img class="revealer-child-S" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <img class="revealer-child-N partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-S partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
             <div class="revealer-handle-NShair"></div>
             <div class="revealer-handle-NS"></div>
           </div>
         </td>
       </tr>
       <tr>
-        <td>
-          <div id="container1" class="revealer-container">
-            <img class="revealer-child-W" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
-            <img class="revealer-child-E" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+        <td colspan="4" rowspan="2">
+          <div id="container3" class="revealer-container">
+            <img class="revealer-child-NW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-NE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <img class="revealer-child-SW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <img class="revealer-child-SE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
             <div class="revealer-handle-EWhair"></div>
             <div class="revealer-handle-NShair"></div>
             <div class="revealer-handle-bidirectional"></div>
           </div>
         </td>
-        <td>
-          <div id="container2" class="revealer-container">
-            <img class="revealer-child-N" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
-            <img class="revealer-child-S" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
-            <div class="revealer-handle-EWhair"></div>
+      </tr>
+      <tr>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div id="container4" class="revealer-container">
+            <img class="revealer-child-NW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-NE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <div class="revealer-child-S partially-transparent" style="background-color:lightblue;"></div>
             <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-EWhair"></div> <!-- TODO: need an EWhair north part only -->
+            <div class="revealer-handle-bidirectional"></div>
+          </div>
+        </td>
+        <td colspan="2">
+          <div id="container4" class="revealer-container">
+            <img class="revealer-child-SW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-SE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <div class="revealer-child-N partially-transparent" style="background-color:lightblue;"></div>
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-EWhair"></div> <!-- TODO: need an EWhair north part only -->
+            <div class="revealer-handle-bidirectional"></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div id="container4" class="revealer-container">
+            <img class="revealer-child-NW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-SW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <div class="revealer-child-E partially-transparent" style="background-color:lightblue;"></div>
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-EWhair"></div> <!-- TODO: need an EWhair north part only -->
+            <div class="revealer-handle-bidirectional"></div>
+          </div>
+        </td>
+        <td colspan="2">
+          <div id="container4" class="revealer-container">
+            <img class="revealer-child-NE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-SE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <div class="revealer-child-W partially-transparent" style="background-color:lightblue;"></div>
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-EWhair"></div> <!-- TODO: need an EWhair north part only -->
             <div class="revealer-handle-bidirectional"></div>
           </div>
         </td>
