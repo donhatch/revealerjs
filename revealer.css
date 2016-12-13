@@ -11,40 +11,23 @@
 /*
  * Implementation notes:
  *  - This stuff should maybe be added by the js?  Not sure.
- *  - for some reason the "before" pseudo-element (or pseudo-class) comes out stacked on top of the primary thing (but under the "after" pseudo-element if any). is this a bug?
+ *  - for some reason the "before" pseudo-element (or pseudo-class) comes out stacked on top of the primary thing (but under the "after" pseudo-element if any). is this a bug? (for current implementation, before or after doesn't matter since the pseudo-element is fully transparent)
  */
 
-.revealer-child-W {
-  clip-path: inset(0 50% 0 0);
-}
-.revealer-child-E {
-  clip-path: inset(0 0 0 50%);
-}
-.revealer-child-N {
-  clip-path: inset(0 0 50% 0);
-}
-.revealer-child-S {
-  clip-path: inset(50% 0 0 0);
-}
-.revealer-child-NW {
-  clip-path: inset(0 50% 50% 0);
-}
-.revealer-child-NE {
-  clip-path: inset(0 0 50% 50%);
-}
-.revealer-child-SE {
-  clip-path: inset(50% 0 0 50%);
-}
-.revealer-child-SW {
-  clip-path: inset(50% 50% 0 0);
-}
+.revealer-child-W  { clip-path: inset(0 50% 0 0); }
+.revealer-child-E  { clip-path: inset(0 0 0 50%); }
+.revealer-child-N  { clip-path: inset(0 0 50% 0); }
+.revealer-child-S  { clip-path: inset(50% 0 0 0); }
+.revealer-child-NW { clip-path: inset(0 50% 50% 0); }
+.revealer-child-NE { clip-path: inset(0 0 50% 50%); }
+.revealer-child-SE { clip-path: inset(50% 0 0 50%); }
+.revealer-child-SW { clip-path: inset(50% 50% 0 0); }
 
 
 .revealer-handle-EWhair {
-  /* the primary one is the full-height one, so we can use a percantage of the parent */
   width:1px;
   height:100%;
-  background-color:black;
+  background-color:gray;
   position:absolute;
   left:50%; top:50%; transform:translate(-50%,-50%);
   cursor: col-resize;
@@ -69,10 +52,9 @@
 
 
 .revealer-handle-NShair {
-  /* the primary one is the full-width one, so we can use a percantage of the parent */
   height:1px;
   width:100%;
-  background-color:black;
+  background-color:gray;
   position:absolute;
   left:50%; top:50%; transform:translate(-50%,-50%);
   cursor: row-resize;
@@ -101,7 +83,6 @@
 .revealer-handle-bidirectional {
   height:12px;
   width:12px;
-  background-color:transparent;
   position:absolute;
   left:50%; top:50%; transform:translate(-50%,-50%);
   background-color: #a080ff; /* violetish light blue */

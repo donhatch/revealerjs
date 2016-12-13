@@ -61,9 +61,10 @@ let setUpRevealer = function(container) {
       let handle_left_on_mousedown = getComputedStyle(handle, null).left; // in pixels unfortunately
       let handle_top_on_mousedown = getComputedStyle(handle, null).top; // in pixels unfortunately
 
-      // Woops! That's wrong when handle is a restricted direction, in which case its other-direction
-      // is locked to 50%.  But in that case there's a bidirectional handle whose position is suitable
-      // for everything.  In fact, whenever there's a bidirectional handle, its position is suitable for everything.
+      // Woops! That's wrong when handle is restricted to one direction, in which case its other-direction coordinate
+      // is locked to 50%.  But in that case there's generally a bidirectional handle whose position is suitable
+      // for everything.  In fact, *whenever* there's a bidirectional handle, its position is suitable for everything,
+      // so use it.
       if (handlesBidirectional.length > 0) {
         handle_left_on_mousedown = getComputedStyle(handlesBidirectional[0], null).left;
         handle_top_on_mousedown = getComputedStyle(handlesBidirectional[0], null).top;
