@@ -59,6 +59,7 @@
 
 
 "use strict";
+// First attempt.  Kinda works but limited.
 let setUpRevealer = function(container) {
   let verboseLevel = 0;
   if (verboseLevel >= 1) console.log("    in setupRevealer(container=",container,")");
@@ -191,6 +192,7 @@ let setUpRevealer = function(container) {
 };  // setUpRevealer
 
 
+// More general strategy.
 let setUpClipInsetDragger = function(container) {
   let verboseLevel = 1;
   if (verboseLevel >= 1) console.log("    in setUpClipInsetDragger(container=",container,")");
@@ -229,6 +231,7 @@ let setUpClipInsetDragger = function(container) {
 
     // Figure out what inset borders we're dragging if anything.
     let childClientClipRects = [];
+    let childWhichBordersAreDraggable = [];
     for (let child of container.children) {
       if (verboseLevel >= 1) console.log("              child=",child);
       if (verboseLevel >= 1) console.log("                  child.style.clipPath=",child.style.clipPath);
@@ -237,6 +240,10 @@ let setUpClipInsetDragger = function(container) {
       let tokens = parseClipPathInset(clipPath);
       let childClientRect = child.getBoundingClientRect();
       if (verboseLevel >= 1) console.log("                  childClientRect=",childClientRect);
+
+      // Look at the data-draggable attribute...
+      let whichChildBorderLettersAreDraggable = child.dataset.draggable; // data-draggable attribute
+      if (verboseLevel >= 1) console.log("                  whichChildBordersAreDraggable="+whichChildBorderLettersAreDraggable);
 
       // Figure out child clip rect, in client coords.
       let childClientClipRect;
@@ -272,12 +279,33 @@ let setUpClipInsetDragger = function(container) {
       }
       if (verboseLevel >= 1) console.log("                  childClientClipRect=",childClientClipRect);
       childClientClipRects.push(childClientClipRect);
+
+      // Figure out which side borders of this child's clip inset are draggable.
+      {
+        let thisChildWhichBordersAreDraggable = [];
+        for (let whichSideLetter of whichChildBorderLettersAreDraggable) {
+          let whichSide = {'T':'top', 'R':'right', 'B':'bottom', 'L':'left'}[whichSideLetter];
+          if (whichSide === undefined) {
+            throw new Error("unrecognized side letter "+JSON.stringify(whichSideLetter)+" in data-draggable attr "+JSON.stringify(whichChildBordersAreDraggable));
+          }
+          thisChildWhichBordersAreDraggable.push(whichSide);
+        }
+        childWhichBordersAreDraggable.push(thisChildWhichBordersAreDraggable);
+      }
+
     } // for each child
     if (verboseLevel >= 1) console.log("              childClientClipRects=",childClientClipRects);
     if (verboseLevel >= 1) console.log("              childClientClipRects=",JSON.stringify(childClientClipRects));
 
     // Which one(s) should I drag?
     // Find closest horizontal edge and closest vertical edge.
+    // TODO: should actually only consider edges that come visibly close to the cursor.
+    //    e.g. in this setup, should *not* allow selecting directly south of the center:
+    //          +---+---+
+    //          |   |   |
+    //          +---+---+
+    //          |       |
+    //          +-------+
     let draggingSpecs; // tuples [childIndex,whichSide,value]
     {
       let thresholdPixels = 8; // TODO: make this configurable I think?
@@ -294,21 +322,18 @@ let setUpClipInsetDragger = function(container) {
       for (let iChild = 0; iChild < nChildren; ++iChild) {
         console.log("iChild="+iChild);
         let childClientClipRect = childClientClipRects[iChild];
-        for (let whichSide of ['top','right','bottom','left']) {
-          if (childClientClipRect[whichSide] != containerClientRect[whichSide]) {
-            // awkward...
-            if (whichSide==='left'||whichSide==='right') {
-              let distX = Math.abs(mouseX - childClientClipRect[whichSide]);
-              if (distX <= thresholdPixels && LEQ(distX, closestDistX, 1e-9)) {
-                if (LT(distX, closestDistX, 1e-9)) { closestDistX = distX; closestSpecsX.length = 0; }
-                closestSpecsX.push([iChild, whichSide, childClientClipRect[whichSide]]);
-              }
-            } else {
-              let distY = Math.abs(mouseY - childClientClipRect[whichSide]);
-              if (distY <= thresholdPixels && LEQ(distY, closestDistY, 1e-9)) {
-                if (LT(distY, closestDistY, 1e-9)) { closestDistY = distY; closestSpecsY.length = 0; }
-                closestSpecsY.push([iChild, whichSide, childClientClipRect[whichSide]]);
-              }
+        for (let whichSide of childWhichBordersAreDraggable[iChild]) {
+          if (whichSide==='left'||whichSide==='right') { // awkward
+            let distX = Math.abs(mouseX - childClientClipRect[whichSide]);
+            if (distX <= thresholdPixels && LEQ(distX, closestDistX, 1e-9)) {
+              if (LT(distX, closestDistX, 1e-9)) { closestDistX = distX; closestSpecsX.length = 0; }
+              closestSpecsX.push([iChild, whichSide, childClientClipRect[whichSide]]);
+            }
+          } else {
+            let distY = Math.abs(mouseY - childClientClipRect[whichSide]);
+            if (distY <= thresholdPixels && LEQ(distY, closestDistY, 1e-9)) {
+              if (LT(distY, closestDistY, 1e-9)) { closestDistY = distY; closestSpecsY.length = 0; }
+              closestSpecsY.push([iChild, whichSide, childClientClipRect[whichSide]]);
             }
           }
         }
@@ -341,37 +366,6 @@ let setUpClipInsetDragger = function(container) {
 
         let x = event.clientX;
         let y = event.clientY;
-
-        // Clamp to strictly inside the container.
-        // This prevents setting an inset to 0 which will stick it to the edge of the container later,
-        // due to logic for deciding what to drag,
-        // while still keeping lefts and rights stuck together.
-        // XXX this still doesn't work reliably. no matter whether fudgePixels is 1 .01 or .001.  figure out why!
-        // XXX the automagic is actually bogus.  need to specify via classes maybe?
-        //        clip-inset-draggable-N
-        //        clip-inset-draggable-S
-        //        clip-inset-draggable-E
-        //        clip-inset-draggable-W
-        //        clip-inset-draggable-NE
-        //        clip-inset-draggable-ES
-        //        clip-inset-draggable-SW
-        //        clip-inset-draggable-WN
-        //        clip-inset-draggable-NES
-        //        clip-inset-draggable-ESW
-        //        clip-inset-draggable-SWN
-        //        clip-inset-draggable-WNE
-        //        clip-inset-draggable-NESW
-        // oh! can do it with a data attibute... https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Using_data_attributes
-        // but is that only html5?  can I use it? hmm I guess it's always possible
-        //        data-which-borders-draggable="WNE"
-        //        
-        {
-          let containerClientRect = container.getBoundingClientRect();
-          let fudgePixels = 1;
-          x = clamp(x, containerClientRect.left+fudgePixels, containerClientRect.right-fudgePixels);
-          y = clamp(y, containerClientRect.top+fudgePixels, containerClientRect.bottom-fudgePixels);
-        }
-
         let dx = x - x_on_mousedown;
         let dy = y - y_on_mousedown;
 
@@ -392,6 +386,8 @@ let setUpClipInsetDragger = function(container) {
           if (whichSide==='bottom' || whichSide==='right') {
             desired_percent = 100 - desired_percent;
           }
+
+          desired_percent = clamp(desired_percent, 0, 100);
 
           tokens[whichSide==='top'?0:whichSide==='right'?1:whichSide==='bottom'?2:whichSide==='left'?3:console.assert(false)] = desired_percent+'%';
           if (verboseLevel >= 1) console.log("                      desired_percent="+desired_percent);
