@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <title>This is the title</title>
+    <style>
+      body {
+        color: purple;
+        background-color: #ffeedd;
+      }
+
+      .clip-inset-dragger-container {
+        width:100%;
+        height:100%;
+        position:relative; /* needed to make children position:absolute work properly */
+        user-select:none; /* seems to be adequate to prevent select on all descendents. without this, the two images get haphazardly selected during dragging. :-( not sure whether it will be appropriate for maps though */
+      }
+      .clip-inset-dragger-container > * {
+        width:100%;
+        height:100%;
+        position:absolute;
+      }
+
+    </style>
+    <link rel="stylesheet" href="revealer.css"></link>
+  </head>
+  <body>
+   <div class="clip-inset-dragger-container" style="cursor:crosshair; display:inline-block; width:80px; height:180; font-size:40px; border-style:solid; border-width:5px; border-color:black;">
+     <div data-draggable="RB"   style="clip-path:inset(0   67% 67% 0); color:red; background-color:pink;">1111<br>1111<br>1111<br>1111</div>
+     <div data-draggable="RBL"  style="clip-path:inset(0   33% 67% 33%); color:green; background-color:lightgreen;">2222<br>2222<br>2222<br>2222</div>
+     <div data-draggable="BL"   style="clip-path:inset(0   0   67% 67%); color:blue; background-color:lightblue;">3333<br>3333<br>3333<br>3333</div>
+     <div data-draggable="TRB"  style="clip-path:inset(33% 67% 33% 0); color:green; background-color:lightgreen;">4444<br>4444<br>4444<br>4444</div>
+     <div data-draggable="TRBL" style="clip-path:inset(33% 33% 33% 33%); color:blue; background-color:lightblue;">5555<br>5555<br>5555<br>5555</div>
+     <div data-draggable="BLT"  style="clip-path:inset(33% 0   33% 67%); color:red; background-color:pink;">6666<br>6666<br>6666<br>6666</div>
+     <div data-draggable="TR"   style="clip-path:inset(67% 67% 0   0); color:blue; background-color:lightblue;">7777<br>7777<br>7777<br>7777</div>
+     <div data-draggable="LTR"  style="clip-path:inset(67% 33% 0   33%); color:red; background-color:pink;">8888<br>8888<br>8888<br>8888</div>
+     <div data-draggable="LT"   style="clip-path:inset(67% 0   0   67%); color:green; background-color:lightgreen;">9999<br>9999<br>9999<br>9999</div>
+     <div></div>
+   </div>
+   &nbsp; &nbsp; &nbsp; &nbsp;
+   <div class="clip-inset-dragger-container" style="cursor:crosshair; display:inline-block; width:58px; height:140; font-size:40px; border-style:solid; border-width:5px; border-color:black;">
+     <div data-draggable="RB" style="clip-path:inset(0   50% 50% 0); color:red; background-color:pink;">111<br>111<br>111</div>
+     <div data-draggable="LB" style="clip-path:inset(0   0   50% 50%); color:green; background-color:lightgreen;">222<br>222<br>222</div>
+     <div data-draggable="RT" style="clip-path:inset(50% 50% 0   0); color:green; background-color:lightgreen;">333<br>333<br>333</div>
+     <div data-draggable="LT" style="clip-path:inset(50% 0   0   50%); color:blue; background-color:lightblue;">444<br>444<br>444</div>
+   </div>
+  </body>
+  <script src="clipInsetDragger.js"></script>
+  <script>
+    {
+      var containers = document.getElementsByClassName("clip-inset-dragger-container");
+      console.log("  clip-inset-dragger-containers=",containers);
+      for (let container of containers) {
+        setUpClipInsetDragger(container);
+      }
+    }
+  </script>
+</html>

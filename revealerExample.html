@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <title>This is the title</title>
+    <style>
+      body {
+        color: purple;
+        background-color: #ffeedd;
+      }
+
+      .revealer-container {
+        width:100%;
+        height:100%;
+        position:relative; /* needed to make children position:absolute work properly */
+        user-select:none; /* seems to be adequate to prevent select on all descendents. without this, the two images get haphazardly selected during dragging. :-( not sure whether it will be appropriate for maps though */
+      }
+
+      .revealer-container > * {
+        width:100%;
+        height:100%;
+        position:absolute;
+      }
+
+      .revealer-container img {
+        /* without the following, once in a while attempts to move the handle are half-interpreted as img ghost drags in which the handle gets the mousedown but there's no mouseup-- frustrating */
+        user-drag:none;
+        -webkit-user-drag: none; /* this is the one that's honored, in chrome 55.0.2883.44 beta anyway */
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
+      }
+    </style>
+    <link rel="stylesheet" href="revealer.css"></link>
+  </head>
+  <body>
+   <hr>
+    Original before and after images:
+    <img src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" width="200" height="100">
+    <img src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" width="200" height="100">       
+    <hr>
+    Revealers:
+    <br>
+
+    <!-- Rationales:
+        - position is needed on container to make children position:absolute work properly
+        - user-select:none needed to prevent selecting images by mistake. putting this on the container seems to be adequate.  (jotform's doesn't bother)
+        - draggable="false" (or -webkit-user-drag:none in chrome) prevents img ghost dragging, which interacts badly with what I'm doing.
+          Still problems:
+            - I get a mouse down without mouse up when right-click (if i don't disable right-click menus)
+            - I get a mouse down without mouse up sometimes when it decides to initiate dragging on the img
+              (if I don't set draggable="false" on the image)
+
+    -->
+    <table style="width:100%; height:50%;">
+      <tr>
+        <td>
+          <div id="container1" class="revealer-container">
+            <img class="revealer-child-W" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-E" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <div class="revealer-handle-EWhair"></div>
+            <div class="revealer-handle-EW"></div>
+          </div>
+        </td>
+        <td>
+          <div id="container2" class="revealer-container">
+            <img class="revealer-child-N" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-S" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-NS"></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div id="container1" class="revealer-container">
+            <img class="revealer-child-W" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-E" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <div class="revealer-handle-EWhair"></div>
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-bidirectional"></div>
+          </div>
+        </td>
+        <td>
+          <div id="container2" class="revealer-container">
+            <img class="revealer-child-N" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
+            <img class="revealer-child-S" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
+            <div class="revealer-handle-EWhair"></div>
+            <div class="revealer-handle-NShair"></div>
+            <div class="revealer-handle-bidirectional"></div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+  <script src="revealer.js"></script>
+  <script>
+    {
+      var containers = document.getElementsByClassName("revealer-container");
+      console.log("  revealer-containers=",containers);
+      for (let container of containers) {
+        setUpRevealer(container);
+      }
+    }
+  </script>
+</html>

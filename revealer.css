@@ -10,9 +10,23 @@
 
 /*
  * Implementation notes:
- *   - This stuff should maybe be added by the js?  Not sure.
+ *  - This stuff should maybe be added by the js?  Not sure.
  *  - for some reason the "before" pseudo-element (or pseudo-class) comes out stacked on top of the primary thing (but under the "after" pseudo-element if any). is this a bug?
  */
+
+.revealer-child-W {
+  clip-path: inset(0 50% 0 0);
+}
+.revealer-child-E {
+  clip-path: inset(0 0 0 50%);
+}
+.revealer-child-N {
+  clip-path: inset(0 0 50% 0);
+}
+.revealer-child-S {
+  clip-path: inset(50% 0 0 0);
+}
+
 
 .revealer-handle-EWhair {
   /* the primary one is the full-height one, so we can use a percantage of the parent */
@@ -24,7 +38,7 @@
   cursor: col-resize;
 }
 .revealer-handle-EWhair:before { /* thick invisible line for easier selection */
-  width:16px;
+  width:10px;
   height:100%;
   position:absolute;
   left:50%; top:50%; transform:translate(-50%,-50%);
@@ -42,7 +56,6 @@
 }
 
 
-
 .revealer-handle-NShair {
   /* the primary one is the full-width one, so we can use a percantage of the parent */
   height:1px;
@@ -54,7 +67,7 @@
 }
 
 .revealer-handle-NShair:before { /* thick invisible line for easier selection */
-  height:16px;
+  height:10px;
   width:100%;
   position:absolute;
   left:50%; top:50%; transform:translate(-50%,-50%);

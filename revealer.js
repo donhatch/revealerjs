@@ -1,24 +1,3 @@
-// Attempt at easer-to-use less-buggy more versatile
-// image revealer.
-//
-// References:
-//   http://www.hongkiat.com/blog/js-image-comparison-sliders/ "5 free image comparison sliders"
-//   http://bennettfeely.com/clippy/
-//   https://www.smashingmagazine.com/2015/05/creating-responsive-shapes-with-clip-path/
-//   https://css-tricks.com/almanac/properties/c/clip/
-//   https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path
-//
-//   This is the first one I found, it looks slick but a bit old
-//   and only works on imgs:
-//     http://www.catchmyfame.com/2009/06/25/jquery-beforeafter-plugin/
-//     http://www.catchmyfame.com/jquery/demo/8/
-//   (hmm, actually the ones on the demo page work better than
-//   the one in the article)
-//
-//   Jotform has a nice one, but with several bugs and limitations:
-//     https://stories.jotform.com/making-a-responsive-image-comparison-slider-in-css-and-javascript-f3a691a9dd71
-//     http://codepen.io/bamf/pen/jEpxOX
-
 "use strict";
 // First attempt.  Kinda works but limited.
 let setUpRevealer = function(container) {
