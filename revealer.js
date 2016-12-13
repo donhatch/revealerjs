@@ -1,3 +1,5 @@
+// BUG: in example html, the 1234 example has text cursor but the 123456789 example has pointer cursor! why?
+
 // Attempt at easer-to-use less-buggy more versatile
 // image revealer.
 //
@@ -196,7 +198,9 @@ let setUpRevealer = function(container) {
 let setUpClipInsetDragger = function(container) {
   let verboseLevel = 1;
   if (verboseLevel >= 1) console.log("    in setUpClipInsetDragger(container=",container,")");
-  // the "dragger object", for purposes of later tear-down
+
+  let equivClasses = [];
+
   let mousedown = function(event) {
     let verboseLevel = 1;
     if (verboseLevel >= 1) console.log("        in mousedown");
@@ -316,30 +320,106 @@ let setUpClipInsetDragger = function(container) {
       let mouseX = event.clientX;
       let mouseY = event.clientY;
       let nChildren = childClientClipRects.length;
-      // have to use fuzzy equality since positions don't match exactly when calculated from different sides
+      // have to use fuzzy equality since positions don't match exactly when calculated from different sides.
+      // Furthermore I've seen:
+      //     189.999994
+      //     189.99993999999998
+      // that's really different! Wtf? 5e-5 or so.
+      // I don't know why it's so bad.   TODO: look into it.
+      // So for now, make tol relatively coarse: we'll use 1e-3.
       let LEQ = (a,b,tol) => a-b <= tol;
       let LT = (a,b,tol) => b-a > tol;
+      let tol = 1e-3;
       for (let iChild = 0; iChild < nChildren; ++iChild) {
         console.log("iChild="+iChild);
         let childClientClipRect = childClientClipRects[iChild];
         for (let whichSide of childWhichBordersAreDraggable[iChild]) {
           if (whichSide==='left'||whichSide==='right') { // awkward
             let distX = Math.abs(mouseX - childClientClipRect[whichSide]);
-            if (distX <= thresholdPixels && LEQ(distX, closestDistX, 1e-9)) {
-              if (LT(distX, closestDistX, 1e-9)) { closestDistX = distX; closestSpecsX.length = 0; }
+            if (distX <= thresholdPixels && LEQ(distX, closestDistX, tol)) {
+              if (LT(distX, closestDistX, tol)) { closestDistX = distX; closestSpecsX.length = 0; }
               closestSpecsX.push([iChild, whichSide, childClientClipRect[whichSide]]);
             }
           } else {
             let distY = Math.abs(mouseY - childClientClipRect[whichSide]);
-            if (distY <= thresholdPixels && LEQ(distY, closestDistY, 1e-9)) {
-              if (LT(distY, closestDistY, 1e-9)) { closestDistY = distY; closestSpecsY.length = 0; }
+            if (distY <= thresholdPixels && LEQ(distY, closestDistY, tol)) {
+              if (LT(distY, closestDistY, tol)) { closestDistY = distY; closestSpecsY.length = 0; }
               closestSpecsY.push([iChild, whichSide, childClientClipRect[whichSide]]);
             }
           }
         }
       }
       draggingSpecs = closestSpecsX.concat(closestSpecsY);
+
+      {
+        // Sanity check: whenever two [iChild,whichSide] pairs occur together in closestSpecsX,
+        // they *always* occur together forever after.  Likewise for Y.
+
+        // In other words, we have a merge-find data structure.
+        // whenever we gather another closestSpecsX (or closestSpecsY),
+        // we merge together everything in it.
+
+        // Then in the future, whenever we get a new group,
+        // for each item in it, every item equiv to that item must also be in the group.
+
+        // Brain dead merge.
+        // If a and/or b does not already occur anywhere, add it.
+        let mergeEquivClassesOfItems = function(equivClasses, a, b) {
+          console.assert(a !== b);
+          let ai = undefined;
+          let bi = undefined;
+          for (let i = 0; i < equivClasses.length; ++i) {
+            for (let j = 0; j < equivClasses[i].length; ++j) {
+              if (equivClasses[i][j] === a) ai = i;
+              if (equivClasses[i][j] === b) bi = i;
+            }
+          }
+          if (ai === undefined) { ai = equivClasses.length; equivClasses.push([a]); }
+          if (bi === undefined) { bi = equivClasses.length; equivClasses.push([b]); }
+          if (ai != bi) {
+            equivClasses[ai] = equivClasses[ai].concat(equivClasses[bi]);
+            equivClasses.splice(bi, 1); // remove [bi]
+          }
+        };
+        // Make sure that for every item that occured previously,
+        // if it's in the new equiv class, then everything that occurred with it
+        // is also in the new equiv class.
+        let sanityCheckNewEquivClass = function(equivClasses, newEquivClass) {
+          let arraysAreDisjoint = function(A,B) {
+            for (let a of A) if (B.indexOf(a) != -1) return false;
+            for (let b of B) if (A.indexOf(b) != -1) return false;
+            return true;
+          };
+          let arrayIsSubsetOf = function(A,B) {
+            for (let a of A) if (B.indexOf(a) == -1) return false;
+            return true;
+          };
+          for (let equivClass of equivClasses) {
+            // must either be disjoint from the new one, or contained in the new one
+            if (!arraysAreDisjoint(equivClass, newEquivClass) && !arrayIsSubsetOf(equivClass, newEquivClass)) {
+              throw new Error("Hey! Had equiv class "+JSON.stringify(equivClass)+" but broken up by new equivalence "+JSON.stringify(newEquivClass));
+            }
+          }
+        };
+        let addNewEquivClass = function(equivClasses, newEquivClass) {
+          // If newEquivClass.length < 2, can ignore it; it's irrelevant.
+          for (let i = 1; i < newEquivClass.length; ++i) {
+            mergeEquivClassesOfItems(equivClasses, newEquivClass[0], newEquivClass[i]);
+          }
+        };
+
+        for (let closestSpecsXorY of [closestSpecsX, closestSpecsY]) {
+          let newEquivClass = [];
+          for (let spec of closestSpecsXorY) {
+            newEquivClass.push(spec[0]+'#'+spec[1]);
+          }
+          sanityCheckNewEquivClass(equivClasses, newEquivClass);
+          addNewEquivClass(equivClasses, newEquivClass);
+        }
+      } // equiv class sanity check stuff
+
     }
+
     if (verboseLevel >= 1) console.log("              draggingSpecs=",JSON.stringify(draggingSpecs));
     if (draggingSpecs.length > 0) {
       // Start dragging them!
@@ -349,7 +429,7 @@ let setUpClipInsetDragger = function(container) {
       let clamp = (x,a,b) => x<=a?a:x>=b?b:x;
 
       let mousemove = function(event) {
-        let verboseLevel = 1;
+        let verboseLevel = 0;
         if (verboseLevel >= 1) console.log("            in mousemove");
         if (verboseLevel >= 1) console.log("              event=",event);
 
@@ -401,21 +481,30 @@ let setUpClipInsetDragger = function(container) {
         if (verboseLevel >= 1) console.log("          event=",event);
         document.removeEventListener("mousemove", mousemove);
         document.removeEventListener("mouseup", mouseup);
+
+        console.log("equivClasses = "+JSON.stringify(equivClasses));
         if (verboseLevel >= 1) console.log("        out mouseup");
       };
       document.addEventListener("mousemove", mousemove);
       document.addEventListener("mouseup", mouseup);
-    }
+
+    } // if draggingSpecs.length > 0
+
+    // TODO: very confused about the ghost-drag behavior at the moment.
+    //event.preventDefault(); // prevents the default ghost-drag behavior (whether or not we initiated a drag above). XXX not sure we want this.  if there's a map underneath, don't we want to
+    // TODO: what about stopPropagation?
 
     if (verboseLevel >= 1) console.log("        out mousedown");
   }; // mousedown
   container.addEventListener("mousedown", mousedown);
-  let answer = {
+
+  // the "dragger object", for purposes of later tear-down
+  let draggerObject = {
     container:container,
     mousedown:mousedown,
   };
   if (verboseLevel >= 1) console.log("    out setUpClipInsetDragger(container=",container,")");
-  return answer;
+  return draggerObject;
 };  // setUpClipInsetDragger
 let tearDownClipInsetDragger = function(draggerObject) {
   let verboseLevel = 1;
