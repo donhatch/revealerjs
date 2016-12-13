@@ -1,59 +1,11 @@
-// Attempt at easer-to-use less-buggy more versatile
-// image revealer.
 //
-// Requirements:
-//      - Must be able to put a google map (or similar) inside the left or right side.
-//        This means we can't be messing with the element's width&height,
-//        since the element's children may be tracking the width and re-laying themselves out based on it.
-//        Therefore we mess with the children's clip regions instead.
-//      - Must be able to have, e.g. 3 images side by side.
-//      - Must be able to have, e.g. 4 images like a window pane.
-//        - Do they push each other around? Should they be able to move each other? Hmm.
-// Oh!  Is this just a clip inset dragger?  Yeah I think so!
+// *** WORK IN PROGRESS ***
 //
-// If using class hints, could be:
-//   <div class="revealer-container">
-//     <img class="revealer-child-W">
-//     <img class="revealer-child-E">
-//   </div>
-//   <div class="revealer-container">
-//     <img class="revealer-child-NW">
-//     <img class="revealer-child-NE">
-//     <img class="revealer-child-SW">
-//     <img class="revealer-child-SE">
-//   </div>
-//
-// If using clip insets, could be:
-//   <div class="revealer-container">
-//     <img src="1.png" style="clip-path:rect(0,67%,33%,100)">
-//     <img src="2.png" style="clip-path:rect(0,33%,33%,67%)">
-//     <img src="3.png" style="clip-path:rect(0,0%,33%,33%)">
-//     <img src="4.png" style="clip-path:rect(33%,67%,67%,100)">
-//     <img src="5.png" style="clip-path:rect(33%,33%,67%,67%)">
-//     <img src="6.png" style="clip-path:rect(33%,0%,67%,33%)">
-//     <img src="7.png" style="clip-path:rect(67%,67%,100%,100)">
-//     <img src="8.png" style="clip-path:rect(67%,33%,100%,67%)">
-//     <img src="9.png" style="clip-path:rect(67%,0%,100%,33%)">
-//   </div>
-//
-//
-// References:
-//   http://www.hongkiat.com/blog/js-image-comparison-sliders/ "5 free image comparison sliders"
-//   http://bennettfeely.com/clippy/
-//   https://www.smashingmagazine.com/2015/05/creating-responsive-shapes-with-clip-path/
-//   https://css-tricks.com/almanac/properties/c/clip/
-//   https://developer.mozilla.org/en-US/docs/Web/CSS/clip-path
-//
-//   This is the first one I found, it looks slick but a bit old
-//   and only works on imgs:
-//     http://www.catchmyfame.com/2009/06/25/jquery-beforeafter-plugin/
-//     http://www.catchmyfame.com/jquery/demo/8/
-//   (hmm, actually the ones on the demo page work better than
-//   the one in the article)
-//
-//   Jotform has a nice one, but with several bugs and limitations:
-//     https://stories.jotform.com/making-a-responsive-image-comparison-slider-in-css-and-javascript-f3a691a9dd71
-//     http://codepen.io/bamf/pen/jEpxOX
+// Attempt to frame the problem as a clip inset dragger.
+// Kinda cool and potentially much more versatile,
+// but the manipulation handles may be difficult to get right.
+// Demo without manipulation handles and without cursor is in
+// clipInsetDraggerExample.html.
 //
 
 "use strict";
