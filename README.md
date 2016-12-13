@@ -8,7 +8,7 @@ Requirements:
         since the element's children may be tracking the element's dimensions and re-laying themselves out based on it.
         Therefore we mess with the children's clip regions instead.
   - must be able to do not just E/W (i.e. side-by-side), but also N/S or NW/NE/SW/SE like a window pane.
-  - no jquery
+  - no jquery, just css and javascript (no, it's not possible to do it in pure css, see Prior Art section below).
 
 Limitations:
   - doesn't use jquery so less likely to work cross-browser
@@ -17,6 +17,13 @@ Limitations:
       - clip-path inset
       - pseudo-elements
       - viewport units, e.g. height="100vw"  (for the example, anyway)
+
+Bugs:
+  - in the 3-pane views, the half-hairs don't shrink and expand properly
+
+Usage:
+  - see revealerExample.html
+
 
 Prior art:
 
