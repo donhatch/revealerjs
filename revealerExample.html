@@ -52,12 +52,12 @@
           Still problems:
             - I get a mouse down without mouse up when right-click (if i don't disable right-click menus)
             - I get a mouse down without mouse up sometimes when it decides to initiate dragging on the img
-              (if I don't set draggable="false" on the image)
+              (if I don't set draggable="false" on the image... but what about for non-images!?)
 
     -->
-    <table style="width:100%; height:100%;">
+    <table style="width:100vw; height:61.8vw; position:absolute;">
       <tr>
-        <td colspan="2">
+        <td>
           <div id="container1" class="revealer-container">
             <img class="revealer-child-W partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
             <img class="revealer-child-E partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
@@ -65,7 +65,7 @@
             <div class="revealer-handle-EW"></div>
           </div>
         </td>
-        <td colspan="2">
+        <td>
           <div id="container2" class="revealer-container">
             <img class="revealer-child-N partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
             <img class="revealer-child-S partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
@@ -75,7 +75,7 @@
         </td>
       </tr>
       <tr>
-        <td colspan="4" rowspan="2">
+        <td colspan="2" rowspan="2">
           <div id="container3" class="revealer-container">
             <img class="revealer-child-NW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
             <img class="revealer-child-NE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
@@ -86,10 +86,7 @@
             <div class="revealer-handle-bidirectional"></div>
           </div>
         </td>
-      </tr>
-      <tr></tr> <!-- just make room for the previous row whose td's have rowspan=2 -->
-      <tr>
-        <td colspan="2">
+        <td>
           <div id="container4" class="revealer-container">
             <img class="revealer-child-SW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
             <img class="revealer-child-SE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
@@ -99,7 +96,7 @@
             <div class="revealer-handle-bidirectional"></div>
           </div>
         </td>
-        <td colspan="2">
+        <td>
           <div id="container4" class="revealer-container">
             <img class="revealer-child-NW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
             <img class="revealer-child-SW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
@@ -110,8 +107,7 @@
           </div>
         </td>
       </tr>
-      <tr>
-        <td colspan="2">
+        <td>
           <div id="container4" class="revealer-container">
             <img class="revealer-child-NE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
             <img class="revealer-child-SE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
@@ -121,7 +117,7 @@
             <div class="revealer-handle-bidirectional"></div>
           </div>
         </td>
-        <td colspan="2">
+        <td>
           <div id="container4" class="revealer-container">
             <img class="revealer-child-NW partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/before.jpg">
             <img class="revealer-child-NE partially-transparent" src="http://egegorgulu.com/assets/img/beforeafter/after.jpg">
@@ -131,7 +127,7 @@
             <div class="revealer-handle-bidirectional"></div>
           </div>
         </td>
-      </tr>
+      <tr>
     </table>
   </body>
   <script src="revealer.js"></script>
