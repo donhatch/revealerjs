@@ -60,6 +60,15 @@ let setUpRevealer = function(container) {
       let y = y_on_mousedown;
       let handle_left_on_mousedown = getComputedStyle(handle, null).left; // in pixels unfortunately
       let handle_top_on_mousedown = getComputedStyle(handle, null).top; // in pixels unfortunately
+
+      // Woops! That's wrong when handle is a restricted direction, in which case its other-direction
+      // is locked to 50%.  But in that case there's a bidirectional handle whose position is suitable
+      // for everything.  In fact, whenever there's a bidirectional handle, its position is suitable for everything.
+      if (handlesBidirectional.length > 0) {
+        handle_left_on_mousedown = getComputedStyle(handlesBidirectional[0], null).left;
+        handle_top_on_mousedown = getComputedStyle(handlesBidirectional[0], null).top;
+      }
+
       if (verboseLevel >= 1) console.log("          handle_left_on_mousedown = ",handle_left_on_mousedown);
       if (!handle_left_on_mousedown.endsWith('px')) {
         throw new Error("Expected style to end in 'px', got "+JSON.stringify(handle_left_on_mousedown));
@@ -70,7 +79,8 @@ let setUpRevealer = function(container) {
       let handle_left_pixels_on_mousedown = parseFloat(handle_left_on_mousedown); /* trailing 'px' ignored per doc */
       let handle_top_pixels_on_mousedown = parseFloat(handle_top_on_mousedown); /* trailing 'px' ignored per doc */
       if (verboseLevel >= 1) console.log("          handle_left_pixels_on_mousedown = ",handle_left_pixels_on_mousedown);
-      // TODO: look into possibly using getBoundingClientRect() or getClientRects()
+      if (verboseLevel >= 1) console.log("          handle_top_pixels_on_mousedown = ",handle_top_pixels_on_mousedown);
+      // TODO: look into possibly using getBoundingClientRect() or getClientRects()? although offsetWidth seems fine.  OH WAIT-- offsetWidth includes the border, we don't want that, do we??
       let container_width_on_mousedown = container.offsetWidth;
       let container_height_on_mousedown = container.offsetHeight;
       if (verboseLevel >= 1) console.log("          container_width_on_mousedown = ",container_width_on_mousedown);
@@ -117,14 +127,24 @@ let setUpRevealer = function(container) {
         if ((freeToMoveEW && dx!=0) || (freeToMoveNS && dy!=0)) {
 
           // Compute new percentages.
-          let new_left_pixels = handle_left_pixels_on_mousedown + Dx;
-          let new_top_pixels = handle_top_pixels_on_mousedown + Dy;
-          if (verboseLevel >= 1) console.log("                  new_left_pixels = "+new_left_pixels);
-          if (verboseLevel >= 1) console.log("                  new_top_pixels = "+new_top_pixels);
-          let new_left_percentage = new_left_pixels / container_width_on_mousedown * 100;
-          let new_top_percentage = new_top_pixels / container_height_on_mousedown * 100;
-          if (verboseLevel >= 1) console.log("                  new_left_percentage = "+new_left_percentage);
-          if (verboseLevel >= 1) console.log("                  new_top_percentage = "+new_top_percentage);
+          let new_left_percentage;
+          let new_top_percentage;
+          if (freeToMoveEW) {
+            let new_left_pixels = handle_left_pixels_on_mousedown + Dx;
+            if (verboseLevel >= 1) console.log("                  new_left_pixels = "+new_left_pixels);
+            new_left_percentage = new_left_pixels / container_width_on_mousedown * 100;
+            if (verboseLevel >= 1) console.log("                  new_left_percentage = "+new_left_percentage);
+          } else {
+            new_left_percentage = handle_left_percentage_on_mousedown;
+          }
+          if (freeToMoveNS) {
+            let new_top_pixels = handle_top_pixels_on_mousedown + Dy;
+            if (verboseLevel >= 1) console.log("                  new_top_pixels = "+new_top_pixels);
+            new_top_percentage = new_top_pixels / container_height_on_mousedown * 100;
+            if (verboseLevel >= 1) console.log("                  new_top_percentage = "+new_top_percentage);
+          } else {
+            new_top_percentage = handle_top_percentage_on_mousedown;
+          }
 
           // Clamp new percentages to [0,100].
           let clamp = (x,a,b) => x<=a?a:x>=b?b:x;
@@ -156,12 +176,11 @@ let setUpRevealer = function(container) {
             if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"% 0 0 0)";
           }
 
-          if (freeToMoveEW && freeToMoveNS) {
-            if (childNW !== undefined) childNW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% "+(100-new_top_percentage)+"% 0)";
-            if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"% 0 0 "+new_left_percentage+"%)";
-            if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
-            if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
-          }
+          // The quarter-image children need to be moved even if not-free in one of the directions.
+          if (childNW !== undefined) childNW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% "+(100-new_top_percentage)+"% 0)";
+          if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"% 0 0 "+new_left_percentage+"%)";
+          if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
+          if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
         }
 
         if (verboseLevel >= 2) console.log("            out mousemove");
