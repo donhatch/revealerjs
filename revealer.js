@@ -31,13 +31,14 @@ let setUpRevealer = function(container) {
   if (verboseLevel >= 1) console.log("      childSW = ",childSW);
   if (verboseLevel >= 1) console.log("      childSE = ",childSE);
 
-  // Remove handles if they exist already
+  // Remove handles if they existed already
   tearDownRevealer(container);
-  // Create handles, depending on what kind of children exist
+
+  // Create the handles, depending on what kind of children exist
   let handlesDiv = document.createElement('div');
   handlesDiv.className = "revealer-handles";
   {
-    // There are 7 possible configurations. Figure out which one we have.
+    // There are 7 supported configurations. Figure out which one we have.
     let configString = '';
     if (childN  !== undefined) configString += "N ";
     if (childS  !== undefined) configString += "S ";
@@ -60,7 +61,7 @@ let setUpRevealer = function(container) {
     };
     let handleClasses = configString2HandleClasses[configString];
     if (handleClasses === undefined) {
-      throw new Error("setupRevealer called on container with config "+JSON.stringify(configString)+" which is not one of the 7 supported configurations");
+      throw new Error("setupRevealer called on container with child config "+JSON.stringify(configString)+" which is not one of the 7 supported configurations");
     }
     for (let handleClass of handleClasses) {
       let handle = document.createElement('div');
@@ -92,6 +93,35 @@ let setUpRevealer = function(container) {
     handlesThatMoveNS = removeUndefineds(handlesNS.concat([handleBidirectional]));
     handles = removeUndefineds(handlesEW.concat(handlesNS).concat([handleBidirectional]));
   }
+
+  let update = function(new_left_percentage, new_top_percentage, needToUpdateX, needToUpdateY) {
+    // Note that all updated values are in percentages rather than pixels,
+    // for graceful behavior on resize.
+    console.assert(needToUpdateX || needToUpdateY); // caller shouldn't call us otherwise
+    if (needToUpdateX) {
+      for (let otherHandle of handlesThatMoveEW) {
+        otherHandle.style.left = new_left_percentage+'%';
+      }
+      if (handleNShairWpartOnly !== undefined) handleNShairWpartOnly.style.width = (new_left_percentage)+'%';
+      if (handleNShairEpartOnly !== undefined) handleNShairEpartOnly.style.width = (100-new_left_percentage)+'%';
+      if (childW !== undefined) childW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% 0 0)";
+      if (childE !== undefined) childE.style.clipPath = "inset(0 0 0 "+new_left_percentage+"%)";
+    }
+    if (needToUpdateY) {
+      for (let otherHandle of handlesThatMoveNS) {
+        otherHandle.style.top = new_top_percentage+'%';
+      }
+      if (handleEWhairNpartOnly != undefined) handleEWhairNpartOnly.style.height = (new_top_percentage)+'%';
+      if (handleEWhairSpartOnly != undefined) handleEWhairSpartOnly.style.height = (100-new_top_percentage)+'%';
+      if (childN !== undefined) childN.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% 0)";
+      if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"% 0 0 0)";
+    }
+    // The quarter-image children's clips need to be resized on any change in either coord axis.
+    if (childNW !== undefined) childNW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% "+(100-new_top_percentage)+"% 0)";
+    if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"% 0 0 "+new_left_percentage+"%)";
+    if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
+    if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
+  }; // update
 
   if (verboseLevel >= 1) console.log("      handles=",handles);
   for (let handle of handles) {
@@ -208,41 +238,7 @@ let setUpRevealer = function(container) {
           if (verboseLevel >= 1) console.log("                  new_left_percentage = "+new_left_percentage+" (clamped)");
           if (verboseLevel >= 1) console.log("                  new_top_percentage = "+new_top_percentage+" (clamped)");
 
-          //
-          // Set the following to it, in percentage rather than pixels
-          // (for graceful behavior on resize):
-          //   - handle's left
-          //   - child-W's clip inset right
-          //   - child-E's clip inset left
-          // etc.
-          //
-          let update = function(needToUpdateX, needToUpdateY) {
-            console.assert(needToUpdateX || needToUpdateY); // caller shouldn't call us otherwise
-            if (needToUpdateX) {
-              for (let otherHandle of handlesThatMoveEW) {
-                otherHandle.style.left = new_left_percentage+'%';
-              }
-              if (handleNShairWpartOnly !== undefined) handleNShairWpartOnly.style.width = (new_left_percentage)+'%';
-              if (handleNShairEpartOnly !== undefined) handleNShairEpartOnly.style.width = (100-new_left_percentage)+'%';
-              if (childW !== undefined) childW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% 0 0)";
-              if (childE !== undefined) childE.style.clipPath = "inset(0 0 0 "+new_left_percentage+"%)";
-            }
-            if (needToUpdateY) {
-              for (let otherHandle of handlesThatMoveNS) {
-                otherHandle.style.top = new_top_percentage+'%';
-              }
-              if (handleEWhairNpartOnly != undefined) handleEWhairNpartOnly.style.height = (new_top_percentage)+'%';
-              if (handleEWhairSpartOnly != undefined) handleEWhairSpartOnly.style.height = (100-new_top_percentage)+'%';
-              if (childN !== undefined) childN.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% 0)";
-              if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"% 0 0 0)";
-            }
-            // The quarter-image children's clips need to be resized on any change in either coord axis.
-            if (childNW !== undefined) childNW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% "+(100-new_top_percentage)+"% 0)";
-            if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"% 0 0 "+new_left_percentage+"%)";
-            if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
-            if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
-          };
-          update(needToUpdateX, needToUpdateY);
+          update(new_left_percentage, new_top_percentage, needToUpdateX, needToUpdateY);
         } // if mouse actually moved a nonzero amount in a free direction
 
         // I don't really understand preventDefault() and stopPropagation(),
