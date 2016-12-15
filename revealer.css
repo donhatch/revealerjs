@@ -34,23 +34,23 @@
   height:100%;
   background-color:gray;
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; transform:translateX(-50%); /* left = left_percentage+'%' */
   cursor: col-resize;
 }
 .revealer-handle-EWhair:before { /* thick invisible line for easier selection */
   width:10px;
   height:100%;
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; transform:translateX(-50%);
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
 .revealer-handle-EWhair-S-part-only {
   width:1px;
-  height:50%;
+  height:50%; /* height = (100-top_percentage)+'%' */
   background-color:gray;
   position:absolute;
-  left:50%; bottom:0%; transform:translate(-50%,0);
+  left:50%; bottom:0; transform:translateX(-50%); /* left = left_percentage+'%' */
   cursor: col-resize;
 }
 .revealer-handle-EWhair-S-part-only:before { /* thick invisible line for easier selection */
@@ -63,10 +63,10 @@
 }
 .revealer-handle-EWhair-N-part-only {
   width:1px;
-  height:50%;
+  height:50%; /* height = top_percentage+'%' */
   background-color:gray;
   position:absolute;
-  left:50%; top:0%; transform:translate(-50%,0);
+  left:50%; top:0; transform:translateX(-50%); /* left = left_percentage+'%' */
   cursor: col-resize;
 }
 .revealer-handle-EWhair-N-part-only:before { /* thick invisible line for easier selection */
@@ -80,9 +80,8 @@
 .revealer-handle-EW {
   width:8px;
   height:20px;
-
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%); /* left = left_percentage+'%'; */
   background-color: #a080ff; /* violetish light blue */
   cursor: col-resize;
 }
@@ -93,7 +92,7 @@
   width:100%;
   background-color:gray;
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  top:50%; transform:translateY(-50%); /* top = top_percentage+'%' */
   cursor: row-resize;
 }
 .revealer-handle-NShair:before { /* thick invisible line for easier selection */
@@ -106,10 +105,10 @@
 }
 .revealer-handle-NShair-E-part-only {
   height:1px;
-  width:50%;
+  width:50%; /* width = (100-top_percentage)+'%' */
   background-color:gray;
   position:absolute;
-  right:0%; top:50%; transform:translate(0,-50%);
+  right:0; top:50%; transform:translateY(-50%); /* top = top_percentage+'%' */
   cursor: row-resize;
 }
 .revealer-handle-NShair-E-part-only:before { /* thick invisible line for easier selection */
@@ -122,10 +121,10 @@
 }
 .revealer-handle-NShair-W-part-only {
   height:1px;
-  width:50%;
+  width:50%; /* width = left_percentage+'%' */
   background-color:gray;
   position:absolute;
-  left:0%; top:50%; transform:translate(0,-50%);
+  left:0; top:50%; transform:translateY(-50%); /* top = top_percentage+'%' */
   cursor: row-resize;
 }
 .revealer-handle-NShair-W-part-only:before { /* thick invisible line for easier selection */
@@ -136,12 +135,11 @@
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
-
 .revealer-handle-NS {
   height:8px;
   width:20px;
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%); /* top = top_percentage+'%' */
   background-color: #a080ff; /* violetish light blue */
   cursor: row-resize;
 }
@@ -151,7 +149,7 @@
   height:12px;
   width:12px;
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%); /* left = left_percentage+'%'; top = top_percentage+'%' */
   background-color: #a080ff; /* violetish light blue */
   cursor: move;
 }

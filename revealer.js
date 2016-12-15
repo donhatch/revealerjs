@@ -13,6 +13,7 @@ let setUpRevealer = function(container) {
   let verboseLevel = 0;
   if (verboseLevel >= 1) console.log("    in setUpRevealer(container=",container,")");
 
+  // any of these 8 may be undefined
   let childW = container.getElementsByClassName("revealer-child-W")[0];
   let childE = container.getElementsByClassName("revealer-child-E")[0];
   let childN = container.getElementsByClassName("revealer-child-N")[0];
@@ -69,26 +70,28 @@ let setUpRevealer = function(container) {
     container.appendChild(handlesDiv);
   }
 
-  let toArray = htmlCollection => [].slice.call(htmlCollection);
+  // any of these 9 may be undefined
+  let handleEW = handlesDiv.getElementsByClassName("revealer-handle-EW")[0];
+  let handleNS = handlesDiv.getElementsByClassName("revealer-handle-NS")[0];
+  let handleBidirectional = handlesDiv.getElementsByClassName("revealer-handle-bidirectional")[0];
+  let handleEWhair = handlesDiv.getElementsByClassName("revealer-handle-EWhair")[0];
+  let handleNShair = handlesDiv.getElementsByClassName("revealer-handle-NShair")[0];
+  let handleEWhairNpartOnly = handlesDiv.getElementsByClassName("revealer-handle-EWhair-N-part-only")[0];
+  let handleEWhairSpartOnly = handlesDiv.getElementsByClassName("revealer-handle-EWhair-S-part-only")[0];
+  let handleNShairEpartOnly = handlesDiv.getElementsByClassName("revealer-handle-NShair-E-part-only")[0];
+  let handleNShairWpartOnly = handlesDiv.getElementsByClassName("revealer-handle-NShair-W-part-only")[0];
 
-  let handlesEWhairNpartOnly = handlesDiv.getElementsByClassName("revealer-handle-EWhair-N-part-only");
-  let handlesEWhairSpartOnly = handlesDiv.getElementsByClassName("revealer-handle-EWhair-S-part-only");
-  let handlesNShairEpartOnly = handlesDiv.getElementsByClassName("revealer-handle-NShair-E-part-only");
-  let handlesNShairWpartOnly = handlesDiv.getElementsByClassName("revealer-handle-NShair-W-part-only");
-
-  let handlesEW = toArray(handlesDiv.getElementsByClassName("revealer-handle-EW"))
-          .concat(toArray(handlesDiv.getElementsByClassName("revealer-handle-EWhair")))
-          .concat(toArray(handlesEWhairNpartOnly))
-          .concat(toArray(handlesEWhairSpartOnly));
-  let handlesNS = toArray(handlesDiv.getElementsByClassName("revealer-handle-NS"))
-          .concat(toArray(handlesDiv.getElementsByClassName("revealer-handle-NShair")))
-          .concat(toArray(handlesNShairEpartOnly))
-          .concat(toArray(handlesNShairWpartOnly));
-  let handlesBidirectional = toArray(handlesDiv.getElementsByClassName("revealer-handle-bidirectional"));
-  let handles = handlesEW.concat(handlesNS).concat(handlesBidirectional);
-  let handlesThatMoveEW = handlesEW.concat(handlesBidirectional);
-  let handlesThatMoveNS = handlesNS.concat(handlesBidirectional);
-
+  let handlesThatMoveEW;
+  let handlesThatMoveNS;
+  let handles;
+  {
+    let removeUndefineds = array=>array.filter(item=>(item!==undefined));
+    let handlesEW = removeUndefineds([handleEW,handleEWhair,handleEWhairNpartOnly,handleEWhairSpartOnly]);
+    let handlesNS = removeUndefineds([handleNS,handleNShair,handleNShairWpartOnly,handleNShairEpartOnly]);
+    handlesThatMoveEW = removeUndefineds(handlesEW.concat([handleBidirectional]));
+    handlesThatMoveNS = removeUndefineds(handlesNS.concat([handleBidirectional]));
+    handles = removeUndefineds(handlesEW.concat(handlesNS).concat([handleBidirectional]));
+  }
 
   if (verboseLevel >= 1) console.log("      handles=",handles);
   for (let handle of handles) {
@@ -113,9 +116,9 @@ let setUpRevealer = function(container) {
       // is locked to 50%.  But in that case there's generally a bidirectional handle whose position is suitable
       // for everything.  In fact, *whenever* there's a bidirectional handle, its position is suitable for everything,
       // so use it.
-      if (handlesBidirectional.length > 0) {
-        handle_left_on_mousedown = getComputedStyle(handlesBidirectional[0], null).left;
-        handle_top_on_mousedown = getComputedStyle(handlesBidirectional[0], null).top;
+      if (handleBidirectional !== undefined) {
+        handle_left_on_mousedown = getComputedStyle(handleBidirectional, null).left;
+        handle_top_on_mousedown = getComputedStyle(handleBidirectional, null).top;
       }
 
       if (verboseLevel >= 1) console.log("          handle_left_on_mousedown = ",handle_left_on_mousedown);
@@ -173,7 +176,10 @@ let setUpRevealer = function(container) {
           return;
         }
 
-        if ((handleIsFreeToMoveEW && dx!=0) || (handleIsFreeToMoveNS && dy!=0)) {
+        let needToUpdateX = handleIsFreeToMoveEW && dx!=0;
+        let needToUpdateY = handleIsFreeToMoveNS && dy!=0;
+
+        if (needToUpdateX || needToUpdateY) {
 
           // Compute new percentages.
           let new_left_percentage;
@@ -210,39 +216,33 @@ let setUpRevealer = function(container) {
           //   - child-E's clip inset left
           // etc.
           //
-          if (handleIsFreeToMoveEW) {
-            for (let otherHandle of handlesThatMoveEW) {
-              otherHandle.style.left = new_left_percentage+'%';
+          let update = function(needToUpdateX, needToUpdateY) {
+            console.assert(needToUpdateX || needToUpdateY); // caller shouldn't call us otherwise
+            if (needToUpdateX) {
+              for (let otherHandle of handlesThatMoveEW) {
+                otherHandle.style.left = new_left_percentage+'%';
+              }
+              if (handleNShairWpartOnly !== undefined) handleNShairWpartOnly.style.width = (new_left_percentage)+'%';
+              if (handleNShairEpartOnly !== undefined) handleNShairEpartOnly.style.width = (100-new_left_percentage)+'%';
+              if (childW !== undefined) childW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% 0 0)";
+              if (childE !== undefined) childE.style.clipPath = "inset(0 0 0 "+new_left_percentage+"%)";
             }
-            for (let handleNShairEpartOnly of handlesNShairEpartOnly) {
-              handleNShairEpartOnly.style.width = (100-new_left_percentage)+'%';
+            if (needToUpdateY) {
+              for (let otherHandle of handlesThatMoveNS) {
+                otherHandle.style.top = new_top_percentage+'%';
+              }
+              if (handleEWhairNpartOnly != undefined) handleEWhairNpartOnly.style.height = (new_top_percentage)+'%';
+              if (handleEWhairSpartOnly != undefined) handleEWhairSpartOnly.style.height = (100-new_top_percentage)+'%';
+              if (childN !== undefined) childN.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% 0)";
+              if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"% 0 0 0)";
             }
-            for (let handleNShairWpartOnly of handlesNShairWpartOnly) {
-              handleNShairWpartOnly.style.width = (new_left_percentage)+'%';
-            }
-            if (childW !== undefined) childW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% 0 0)";
-            if (childE !== undefined) childE.style.clipPath = "inset(0 0 0 "+new_left_percentage+"%)";
-          }
-          if (handleIsFreeToMoveNS) {
-            for (let otherHandle of handlesThatMoveNS) {
-              otherHandle.style.top = new_top_percentage+'%';
-            }
-            for (let handleEWhairNpartOnly of handlesEWhairNpartOnly) {
-              handleEWhairNpartOnly.style.height = (new_top_percentage)+'%';
-            }
-            for (let handleEWhairSpartOnly of handlesEWhairSpartOnly) {
-              handleEWhairSpartOnly.style.height = (100-new_top_percentage)+'%';
-            }
-            if (childN !== undefined) childN.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% 0)";
-            if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"% 0 0 0)";
-          }
-
-          // The quarter-image children's clips need to be resized even if not-free in one of the directions.
-          if (childNW !== undefined) childNW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% "+(100-new_top_percentage)+"% 0)";
-          if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"% 0 0 "+new_left_percentage+"%)";
-          if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
-          if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
-
+            // The quarter-image children's clips need to be resized on any change in either coord axis.
+            if (childNW !== undefined) childNW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% "+(100-new_top_percentage)+"% 0)";
+            if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"% 0 0 "+new_left_percentage+"%)";
+            if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
+            if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
+          };
+          update(needToUpdateX, needToUpdateY);
         } // if mouse actually moved a nonzero amount in a free direction
 
         // I don't really understand preventDefault() and stopPropagation(),
