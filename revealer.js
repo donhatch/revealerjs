@@ -1,4 +1,15 @@
 "use strict";
+let tearDownRevealer = function(container) {
+  // Remove handles if they exist already.
+  // That removes all event handlers on them (I hope).
+  let handlesDivs = container.getElementsByClassName("revealer-handles");
+  for (let handlesDiv of handlesDivs) {
+    if (handlesDiv.parentElement === container) {
+      console.log("      removing it!");
+       container.removeChild(handlesDiv);
+    }
+  }
+};
 let setUpRevealer = function(container) {
   let verboseLevel = 0;
   if (verboseLevel >= 1) console.log("    in setUpRevealer(container=",container,")");
@@ -20,26 +31,64 @@ let setUpRevealer = function(container) {
   if (verboseLevel >= 1) console.log("      childSW = ",childSW);
   if (verboseLevel >= 1) console.log("      childSE = ",childSE);
 
+  // Remove handles if they exist already
+  tearDownRevealer(container);
+  // Create handles, depending on what kind of children exist
+  let handlesDiv = document.createElement('div');
+  {
+    // There are 7 possible configurations. Figure out which one we have.
+    let configString = '';
+    if (childN  !== undefined) configString += "N ";
+    if (childS  !== undefined) configString += "S ";
+    if (childW  !== undefined) configString += "W ";
+    if (childE  !== undefined) configString += "E ";
+    if (childNW !== undefined) configString += "NW ";
+    if (childNE !== undefined) configString += "NE ";
+    if (childSW !== undefined) configString += "SW ";
+    if (childSE !== undefined) configString += "SE ";
+    configString = configString.trim();
+    if (verboseLevel >= 1) console.log("      configString="+JSON.stringify(configString));
+    let configString2HandleClasses = {
+      "W E": [ "revealer-handle-EWhair", "revealer-handle-EW"],
+      "N S": [ "revealer-handle-NShair", "revealer-handle-NS"],
+      "NW NE SW SE": [ "revealer-handle-EWhair", "revealer-handle-NShair", "revealer-handle-bidirectional"],
+      "W NE SE": [ "revealer-handle-NShair-E-part-only", "revealer-handle-EWhair", "revealer-handle-bidirectional"],
+      "E NW SW": [ "revealer-handle-NShair-W-part-only", "revealer-handle-EWhair", "revealer-handle-bidirectional"],
+      "N SW SE": [ "revealer-handle-NShair", "revealer-handle-EWhair-S-part-only", "revealer-handle-bidirectional"],
+      "S NW NE": [ "revealer-handle-NShair", "revealer-handle-EWhair-N-part-only", "revealer-handle-bidirectional"],
+    };
+    let handleClasses = configString2HandleClasses[configString];
+    if (handleClasses === undefined) {
+      throw new Error("setupRevealer called on container with config "+JSON.stringify(configString)+" which is not one of the 7 supported configurations");
+    }
+    for (let handleClass of handleClasses) {
+      let handle = document.createElement('div');
+      handle.className = handleClass;
+      handlesDiv.appendChild(handle);
+    }
+    container.appendChild(handlesDiv);
+  }
 
   let toArray = htmlCollection => [].slice.call(htmlCollection);
 
-  let handlesEWhairNpartOnly = container.getElementsByClassName("revealer-handle-EWhair-N-part-only");
-  let handlesEWhairSpartOnly = container.getElementsByClassName("revealer-handle-EWhair-S-part-only");
-  let handlesNShairEpartOnly = container.getElementsByClassName("revealer-handle-NShair-E-part-only");
-  let handlesNShairWpartOnly = container.getElementsByClassName("revealer-handle-NShair-W-part-only");
+  let handlesEWhairNpartOnly = handlesDiv.getElementsByClassName("revealer-handle-EWhair-N-part-only");
+  let handlesEWhairSpartOnly = handlesDiv.getElementsByClassName("revealer-handle-EWhair-S-part-only");
+  let handlesNShairEpartOnly = handlesDiv.getElementsByClassName("revealer-handle-NShair-E-part-only");
+  let handlesNShairWpartOnly = handlesDiv.getElementsByClassName("revealer-handle-NShair-W-part-only");
 
-  let handlesEW = toArray(container.getElementsByClassName("revealer-handle-EW"))
-          .concat(toArray(container.getElementsByClassName("revealer-handle-EWhair")))
+  let handlesEW = toArray(handlesDiv.getElementsByClassName("revealer-handle-EW"))
+          .concat(toArray(handlesDiv.getElementsByClassName("revealer-handle-EWhair")))
           .concat(toArray(handlesEWhairNpartOnly))
           .concat(toArray(handlesEWhairSpartOnly));
-  let handlesNS = toArray(container.getElementsByClassName("revealer-handle-NS"))
-          .concat(toArray(container.getElementsByClassName("revealer-handle-NShair")))
+  let handlesNS = toArray(handlesDiv.getElementsByClassName("revealer-handle-NS"))
+          .concat(toArray(handlesDiv.getElementsByClassName("revealer-handle-NShair")))
           .concat(toArray(handlesNShairEpartOnly))
           .concat(toArray(handlesNShairWpartOnly));
-  let handlesBidirectional = toArray(container.getElementsByClassName("revealer-handle-bidirectional"));
+  let handlesBidirectional = toArray(handlesDiv.getElementsByClassName("revealer-handle-bidirectional"));
   let handles = handlesEW.concat(handlesNS).concat(handlesBidirectional);
   let handlesThatMoveEW = handlesEW.concat(handlesBidirectional);
   let handlesThatMoveNS = handlesNS.concat(handlesBidirectional);
+
 
   if (verboseLevel >= 1) console.log("      handles=",handles);
   for (let handle of handles) {
