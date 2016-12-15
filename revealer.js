@@ -166,11 +166,9 @@ let setUpRevealer = function(container) {
               otherHandle.style.left = new_left_percentage+'%';
             }
             for (let handleNShairEpartOnly of handlesNShairEpartOnly) {
-              console.log("E!");
               handleNShairEpartOnly.style.width = (100-new_left_percentage)+'%';
             }
             for (let handleNShairWpartOnly of handlesNShairWpartOnly) {
-              console.log("W!");
               handleNShairWpartOnly.style.width = (new_left_percentage)+'%';
             }
             if (childW !== undefined) childW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% 0 0)";
@@ -190,7 +188,7 @@ let setUpRevealer = function(container) {
             if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"% 0 0 0)";
           }
 
-          // The quarter-image children need to be moved even if not-free in one of the directions.
+          // The quarter-image children's clips need to be resized even if not-free in one of the directions.
           if (childNW !== undefined) childNW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% "+(100-new_top_percentage)+"% 0)";
           if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"% 0 0 "+new_left_percentage+"%)";
           if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
