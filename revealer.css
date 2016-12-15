@@ -50,14 +50,14 @@
   height:50%;
   background-color:gray;
   position:absolute;
-  left:50%; top:75%; transform:translate(-50%,-50%);
+  left:50%; bottom:0%; transform:translate(-50%,0);
   cursor: col-resize;
 }
 .revealer-handle-EWhair-S-part-only:before { /* thick invisible line for easier selection */
   width:10px;
   height:100%; /* of the thing it's following! not of the parent */
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%); /* always */
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
@@ -66,14 +66,14 @@
   height:50%;
   background-color:gray;
   position:absolute;
-  left:50%; top:25%; transform:translate(-50%,-50%);
+  left:50%; top:0%; transform:translate(-50%,0);
   cursor: col-resize;
 }
 .revealer-handle-EWhair-N-part-only:before { /* thick invisible line for easier selection */
   width:10px;
   height:100%; /* of the thing it's following, not of the parent */
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%); /* always */
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
@@ -100,7 +100,7 @@
   height:10px;
   width:100%;
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%); /* always */
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
@@ -109,14 +109,14 @@
   width:50%;
   background-color:gray;
   position:absolute;
-  left:75%; top:50%; transform:translate(-50%,-50%);
+  right:0%; top:50%; transform:translate(0,-50%);
   cursor: row-resize;
 }
 .revealer-handle-NShair-E-part-only:before { /* thick invisible line for easier selection */
   height:10px;
   width:100%; /* of the thing it's following, not the parent */
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%); /* always */
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }
@@ -125,14 +125,14 @@
   width:50%;
   background-color:gray;
   position:absolute;
-  left:25%; top:50%; transform:translate(-50%,-50%);
+  left:0%; top:50%; transform:translate(0,-50%);
   cursor: row-resize;
 }
 .revealer-handle-NShair-W-part-only:before { /* thick invisible line for easier selection */
   height:10px;
   width:100%; /* of the thing it's following, not the parent */
   position:absolute;
-  left:50%; top:50%; transform:translate(-50%,-50%);
+  left:50%; top:50%; transform:translate(-50%,-50%); /* always */
   background-color:transparent;
   content:''; /* pseudo-elements require content to function  */
 }

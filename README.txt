@@ -19,7 +19,6 @@ Limitations:
       - viewport units, e.g. height="100vw"  (for the example, anyway)
 
 Bugs:
-  - in the 3-pane views, the half-hairs don't shrink and expand properly
   - cursors aren't ideal on ubuntu..
      I like the way move, col-resize, row-resize look on macbook pro with chrome 55.0.2883.44,
      but they are crappy on ubuntu with chrome 56.0.2924.21.

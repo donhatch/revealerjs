@@ -1,17 +1,8 @@
 "use strict";
-// First attempt.  Kinda works but limited.
 let setUpRevealer = function(container) {
   let verboseLevel = 0;
   if (verboseLevel >= 1) console.log("    in setUpRevealer(container=",container,")");
 
-  // TODO: handle and sanity check all common configurations:
-  //        W E
-  //        N S
-  //        NW NE S
-  //        SE SW N
-  //        NW SW E
-  //        NE SE W
-  //        NW NE SW SE
   let childW = container.getElementsByClassName("revealer-child-W")[0];
   let childE = container.getElementsByClassName("revealer-child-E")[0];
   let childN = container.getElementsByClassName("revealer-child-N")[0];
@@ -32,14 +23,19 @@ let setUpRevealer = function(container) {
 
   let toArray = htmlCollection => [].slice.call(htmlCollection);
 
+  let handlesEWhairNpartOnly = container.getElementsByClassName("revealer-handle-EWhair-N-part-only");
+  let handlesEWhairSpartOnly = container.getElementsByClassName("revealer-handle-EWhair-S-part-only");
+  let handlesNShairEpartOnly = container.getElementsByClassName("revealer-handle-NShair-E-part-only");
+  let handlesNShairWpartOnly = container.getElementsByClassName("revealer-handle-NShair-W-part-only");
+
   let handlesEW = toArray(container.getElementsByClassName("revealer-handle-EW"))
           .concat(toArray(container.getElementsByClassName("revealer-handle-EWhair")))
-          .concat(toArray(container.getElementsByClassName("revealer-handle-EWhair-N-part-only")))
-          .concat(toArray(container.getElementsByClassName("revealer-handle-EWhair-S-part-only")));
+          .concat(toArray(handlesEWhairNpartOnly))
+          .concat(toArray(handlesEWhairSpartOnly));
   let handlesNS = toArray(container.getElementsByClassName("revealer-handle-NS"))
           .concat(toArray(container.getElementsByClassName("revealer-handle-NShair")))
-          .concat(toArray(container.getElementsByClassName("revealer-handle-NShair-E-part-only")))
-          .concat(toArray(container.getElementsByClassName("revealer-handle-NShair-W-part-only")));
+          .concat(toArray(handlesNShairEpartOnly))
+          .concat(toArray(handlesNShairWpartOnly));
   let handlesBidirectional = toArray(container.getElementsByClassName("revealer-handle-bidirectional"));
   let handles = handlesEW.concat(handlesNS).concat(handlesBidirectional);
   let handlesThatMoveEW = handlesEW.concat(handlesBidirectional);
@@ -49,8 +45,8 @@ let setUpRevealer = function(container) {
   for (let handle of handles) {
     if (verboseLevel >= 1) console.log("          handle=",handle);
 
-    let freeToMoveNS = handlesThatMoveNS.indexOf(handle) != -1;
-    let freeToMoveEW = handlesThatMoveEW.indexOf(handle) != -1;
+    let handleIsFreeToMoveNS = handlesThatMoveNS.indexOf(handle) != -1;
+    let handleIsFreeToMoveEW = handlesThatMoveEW.indexOf(handle) != -1;
 
     let mousedown = function(event) {
       let verboseLevel = 0;
@@ -128,12 +124,12 @@ let setUpRevealer = function(container) {
           return;
         }
 
-        if ((freeToMoveEW && dx!=0) || (freeToMoveNS && dy!=0)) {
+        if ((handleIsFreeToMoveEW && dx!=0) || (handleIsFreeToMoveNS && dy!=0)) {
 
           // Compute new percentages.
           let new_left_percentage;
           let new_top_percentage;
-          if (freeToMoveEW) {
+          if (handleIsFreeToMoveEW) {
             let new_left_pixels = handle_left_pixels_on_mousedown + Dx;
             if (verboseLevel >= 1) console.log("                  new_left_pixels = "+new_left_pixels);
             new_left_percentage = new_left_pixels / container_width_on_mousedown * 100;
@@ -141,7 +137,7 @@ let setUpRevealer = function(container) {
           } else {
             new_left_percentage = handle_left_percentage_on_mousedown;
           }
-          if (freeToMoveNS) {
+          if (handleIsFreeToMoveNS) {
             let new_top_pixels = handle_top_pixels_on_mousedown + Dy;
             if (verboseLevel >= 1) console.log("                  new_top_pixels = "+new_top_pixels);
             new_top_percentage = new_top_pixels / container_height_on_mousedown * 100;
@@ -165,16 +161,30 @@ let setUpRevealer = function(container) {
           //   - child-E's clip inset left
           // etc.
           //
-          if (freeToMoveEW) {
+          if (handleIsFreeToMoveEW) {
             for (let otherHandle of handlesThatMoveEW) {
               otherHandle.style.left = new_left_percentage+'%';
+            }
+            for (let handleNShairEpartOnly of handlesNShairEpartOnly) {
+              console.log("E!");
+              handleNShairEpartOnly.style.width = (100-new_left_percentage)+'%';
+            }
+            for (let handleNShairWpartOnly of handlesNShairWpartOnly) {
+              console.log("W!");
+              handleNShairWpartOnly.style.width = (new_left_percentage)+'%';
             }
             if (childW !== undefined) childW.style.clipPath = "inset(0 "+(100-new_left_percentage)+"% 0 0)";
             if (childE !== undefined) childE.style.clipPath = "inset(0 0 0 "+new_left_percentage+"%)";
           }
-          if (freeToMoveNS) {
+          if (handleIsFreeToMoveNS) {
             for (let otherHandle of handlesThatMoveNS) {
               otherHandle.style.top = new_top_percentage+'%';
+            }
+            for (let handleEWhairNpartOnly of handlesEWhairNpartOnly) {
+              handleEWhairNpartOnly.style.height = (new_top_percentage)+'%';
+            }
+            for (let handleEWhairSpartOnly of handlesEWhairSpartOnly) {
+              handleEWhairSpartOnly.style.height = (100-new_top_percentage)+'%';
             }
             if (childN !== undefined) childN.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% 0)";
             if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"% 0 0 0)";
@@ -185,7 +195,8 @@ let setUpRevealer = function(container) {
           if (childSE !== undefined) childSE.style.clipPath = "inset("+new_top_percentage+"% 0 0 "+new_left_percentage+"%)";
           if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
           if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
-        }
+
+        } // if mouse actually moved a nonzero amount in a free direction
 
         // I don't really understand preventDefault() and stopPropagation(),
         // but, empirically, preventDefault is good because it prevents
