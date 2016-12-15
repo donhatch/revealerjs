@@ -7,7 +7,14 @@ Requirements:
         This means we can't be messing with the element's width&height,
         since the element's children may be tracking the element's dimensions and re-laying themselves out based on it.
         Therefore we mess with the children's clip regions instead.
-  - must be able to do not just E/W (i.e. side-by-side), but also N/S or NW/NE/SW/SE like a window pane.
+  - must be able to do not just side-by-side, but all of the following 7 configurations:
+      E/W (side-by-side)
+      N/S (top and bottom)
+      NW/NE/SW/SE (like a window pane)
+      NW/NE/S
+      N/SW/SE
+      W/NE/SE
+      NW/SW/E
   - no jquery, just css and javascript (no, it's not possible to do it in pure css, see Prior Art section below).
 
 Limitations:
@@ -55,7 +62,7 @@ Prior art:
    There's supposedly an example using pure css:
      http://lea.verou.me/2014/07/image-comparison-slider-with-pure-css/
    but, as the jotform article points out, it's highly limited,
-   e.g. it's apparently impossible to make it start at 50%
+   e.g. it's apparently impossible to make it start at 50% on chrome
    without introducing other crappy behavior:
      http://stackoverflow.com/questions/38174948/how-do-i-make-this-pure-css-image-comparison-slider-start-at-the-middle#answer-38175340
 
