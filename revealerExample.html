@@ -124,8 +124,8 @@
   <script>
     {
       var containers = document.getElementsByClassName("revealer-container");
-      console.log("  revealer-containers=",containers);
       for (let container of containers) {
+        console.log("      setting up revealer-container ",container);
         setUpRevealer(container);
       }
     }
