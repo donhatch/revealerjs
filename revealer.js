@@ -5,8 +5,7 @@ let tearDownRevealer = function(container) {
   let handlesDivs = container.getElementsByClassName("revealer-handles");
   for (let handlesDiv of handlesDivs) {
     if (handlesDiv.parentElement === container) {
-      console.log("      removing it!");
-       container.removeChild(handlesDiv);
+      container.removeChild(handlesDiv);
     }
   }
 };
