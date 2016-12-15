@@ -111,8 +111,8 @@ let setUpRevealer = function(container) {
       for (let otherHandle of handlesThatMoveNS) {
         otherHandle.style.top = new_top_percentage+'%';
       }
-      if (handleEWhairNpartOnly != undefined) handleEWhairNpartOnly.style.height = (new_top_percentage)+'%';
-      if (handleEWhairSpartOnly != undefined) handleEWhairSpartOnly.style.height = (100-new_top_percentage)+'%';
+      if (handleEWhairNpartOnly !== undefined) handleEWhairNpartOnly.style.height = (new_top_percentage)+'%';
+      if (handleEWhairSpartOnly !== undefined) handleEWhairSpartOnly.style.height = (100-new_top_percentage)+'%';
       if (childN !== undefined) childN.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% 0)";
       if (childS !== undefined) childS.style.clipPath = "inset("+new_top_percentage+"% 0 0 0)";
     }
@@ -122,6 +122,62 @@ let setUpRevealer = function(container) {
     if (childSW !== undefined) childSW.style.clipPath = "inset("+new_top_percentage+"% "+(100-new_left_percentage)+"% 0 0)";
     if (childNE !== undefined) childNE.style.clipPath = "inset(0 0 "+(100-new_top_percentage)+"% "+new_left_percentage+"%)";
   }; // update
+
+  if (true) {
+    // Figure out starting left and top percentage.
+    // These can be extracted from the childrens' clip paths
+    // (either from the style sheet, or from previous interaction with a revealer).
+
+    // E.g. 'inset(0px 33% 67%)' -> ['0px', '33%', '67%', '33%']
+    let parseClipPathInset = clipPath => {
+      let verboseLevel = 0;
+      if (verboseLevel >= 1) console.log("                in parseClipPathInset("+JSON.stringify(clipPath)+")");
+      if (!(clipPath.startsWith('inset(') && clipPath.endsWith(')'))) {
+          throw new Error("unrecognized clip path "+JSON.stringify(clipPath));
+      }
+      let clipPathParamsString = clipPath.slice(6, -1);
+      if (verboseLevel >= 1) console.log("                  clipPathParams=",clipPathParamsString);
+      let tokens = clipPathParamsString.split(/ +/);
+      if (verboseLevel >= 1) console.log("                  tokens=",tokens);
+      // expand shorthand so 4 tokens
+      if (!(tokens.length >= 1 && tokens.length <= 4)) {
+          throw new Error("Unexpected number of tokens "+tokens.length+" in inset in clip-path "+JSON.stringify(clipPath));
+      }
+      if (tokens.length == 1) tokens.push(tokens[0]); // right = top if not given
+      if (tokens.length == 2) tokens.push(tokens[0]); // bottom = top if not given
+      if (tokens.length == 3) tokens.push(tokens[1]); // left = right if not given
+      if (verboseLevel >= 1) console.log("                  tokens=",tokens," (after expanding shorthand)");
+      console.assert(tokens.length == 4);
+      if (verboseLevel >= 1) console.log("                out parseClipPathInset("+JSON.stringify(clipPath)+"), returning tokens="+JSON.stringify(tokens));
+      return tokens;
+    }; // parseClipPathInset
+    let getPercentage = function(token) {
+      if (token.endsWith('%')) return parseFloat(token);
+      if (token == '0px') return 0;
+      throw new Error('unexpected token '+JSON.stringify(token)+' in clip path inset');
+    };
+
+    let left_percentage = 50;
+    let top_percentage = 50;
+    if (childSE !== undefined && childSE.style.clipPath !== "") {
+      let tokens = parseClipPathInset(childSE.style.clipPath);
+      top_percentage = getPercentage(tokens[0]);
+      left_percentage = getPercentage(tokens[3]);
+    } else if (childNW !== undefined && childNW.style.clipPath !== "") {
+      let tokens = parseClipPathInset(childNW.style.clipPath);
+      left_percentage = 100-getPercentage(tokens[1]);
+      top_percentage = 100-getPercentage(tokens[2]);
+    } else if (childS !== undefined && childS.style.clipPath !== "") {
+      let tokens = parseClipPathInset(childS.style.clipPath);
+      top_percentage = getPercentage(tokens[0]);
+    } else if (childE !== undefined && childE.style.clipPath !== "") {
+      let tokens = parseClipPathInset(childE.style.clipPath);
+      left_percentage = getPercentage(tokens[3]);
+    }
+    if (verboseLevel >= 1) console.log("      starting left_percentage=",left_percentage);
+    if (verboseLevel >= 1) console.log("      starting top_percentage=",top_percentage);
+    update(left_percentage, top_percentage, true, true);
+  }
 
   if (verboseLevel >= 1) console.log("      handles=",handles);
   for (let handle of handles) {
@@ -262,7 +318,6 @@ let setUpRevealer = function(container) {
       if (verboseLevel >= 1) console.log("        out mousedown");
     };
     handle.addEventListener("mousedown", mousedown);
-
-  } // if handles.length == 1
+  } // for each handle
   if (verboseLevel >= 1) console.log("    out setUpRevealer(container=",container,")");
 };  // setUpRevealer
