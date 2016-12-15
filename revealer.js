@@ -35,6 +35,7 @@ let setUpRevealer = function(container) {
   tearDownRevealer(container);
   // Create handles, depending on what kind of children exist
   let handlesDiv = document.createElement('div');
+  handlesDiv.className = "revealer-handles";
   {
     // There are 7 possible configurations. Figure out which one we have.
     let configString = '';

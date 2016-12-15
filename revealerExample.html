@@ -33,7 +33,8 @@
     <img src="http://egegorgulu.com/assets/img/beforeafter/before.jpg" width="200" height="100">
     <img src="http://egegorgulu.com/assets/img/beforeafter/after.jpg" width="200" height="100">       
     <hr>
-    Revealers:
+    <button type="button" onclick="setUpAllRevealers()">Set up revealers</button>
+    <button type="button" onclick="tearDownAllRevealers()">Tear down revealers</button>
     <br>
 
     <!-- Rationales:
@@ -103,12 +104,19 @@
   </body>
   <script src="revealer.js"></script>
   <script>
-    {
+    let setUpAllRevealers = function() {
       var containers = document.getElementsByClassName("revealer-container");
       for (let container of containers) {
         console.log("      setting up revealer-container ",container);
         setUpRevealer(container);
       }
-    }
+    };
+    let tearDownAllRevealers = function() {
+      var containers = document.getElementsByClassName("revealer-container");
+      for (let container of containers) {
+        console.log("      tearing down revealer-container ",container);
+        tearDownRevealer(container);
+      }
+    };
   </script>
 </html>

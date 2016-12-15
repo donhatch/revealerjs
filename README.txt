@@ -28,6 +28,7 @@ Bugs:
        http://www.evotech.net/blog/2007/04/controlling-cursors-with-css-and-creating-cur-files/
     if I care enough, I could compose one by hand using something like:
       cursor: url(data:image/png;base64,iVBORw0KGgoAASUhEUgAAACAAAAAgCAYAAABzenr0AAAJFklEQVR42rWXCXBU9R3Hv+/V...), move;
+  - setUp/manipulate/tearDown/setUp puts handles back at 50%, out of sync with child images until dragged
 
 Usage:
   - see revealerExample.html
