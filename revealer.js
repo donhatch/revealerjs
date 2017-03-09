@@ -128,6 +128,7 @@ let setUpRevealer = function(container) {
     // These can be extracted from the childrens' clip paths
     // (either from the style sheet, or from previous interaction with a revealer).
 
+    // from-top from-right from-bottom from-left, any prefix is legal.
     // E.g. 'inset(0px 33% 67%)' -> ['0px', '33%', '67%', '33%']
     let parseClipPathInset = clipPath => {
       let verboseLevel = 0;
@@ -160,19 +161,44 @@ let setUpRevealer = function(container) {
     let left_percentage = 50;
     let top_percentage = 50;
     if (childSE !== undefined && childSE.style.clipPath !== "") {
+      if (verboseLevel >= 1) console.log("      childSE case");
       let tokens = parseClipPathInset(childSE.style.clipPath);
       top_percentage = getPercentage(tokens[0]);
       left_percentage = getPercentage(tokens[3]);
     } else if (childNW !== undefined && childNW.style.clipPath !== "") {
+      if (verboseLevel >= 1) console.log("      childNW case");
       let tokens = parseClipPathInset(childNW.style.clipPath);
       left_percentage = 100-getPercentage(tokens[1]);
       top_percentage = 100-getPercentage(tokens[2]);
     } else if (childS !== undefined && childS.style.clipPath !== "") {
+      if (verboseLevel >= 1) console.log("      childS case");
       let tokens = parseClipPathInset(childS.style.clipPath);
-      top_percentage = getPercentage(tokens[0]);
+      if (tokens[0][0]==='0'&&tokens[1][0]==='0'&&tokens[2][0]==='0') {
+        // Assume S child was formerly E child.
+        top_percentage = getPercentage(tokens[3]);
+      } else if (tokens[0][0]==='0'&&tokens[2][0]==='0'&&tokens[3][0]==='0') {
+        // Assume S child was formerly W child.
+        top_percentage = getPercentage(tokens[1]);
+      } else {
+        top_percentage = getPercentage(tokens[0]);
+      }
     } else if (childE !== undefined && childE.style.clipPath !== "") {
+      if (verboseLevel >= 1) console.log("      childE case");
+      // Okay there's a funny case here: when we're changing a slider from N/S to W/E.
+      // In this case the E child was formerly the S child,
+      // so we'll have, for example, top=20% right=0px bottom=0px left=0px.
       let tokens = parseClipPathInset(childE.style.clipPath);
-      left_percentage = getPercentage(tokens[3]);
+      if (tokens[1][0]==='0'&&tokens[2][0]==='0'&&tokens[3][0]==='0') {
+        // Assume E child was formerly S child.
+        left_percentage = getPercentage(tokens[0]);
+      } else if (tokens[0][0]==='0'&&tokens[1][0]==='0'&&tokens[3][0]==='0') {
+        // Assume E child was formerly N child.
+        left_percentage = 100-getPercentage(tokens[2]);
+      } else {
+        left_percentage = getPercentage(tokens[3]);
+      }
+    } else {
+      console.log("      no clues, leaving at 50/50");
     }
     if (verboseLevel >= 1) console.log("      starting left_percentage=",left_percentage);
     if (verboseLevel >= 1) console.log("      starting top_percentage=",top_percentage);
